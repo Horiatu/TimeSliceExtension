@@ -8,14 +8,8 @@ define([
   "dojo/store/Observable",
   "esri/tasks/query",
   "dgrid/OnDemandGrid",
-  // "dojox/charting/Chart",
-  // "dojox/charting/themes/Claro",
-  // "//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dojox//charting/plot2d/Pie.js",
   "dojo/text!./TimeChartWidgetTemplate.html"
-], function (declare, lang, _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, 
-  // Chart, theme,
-  // PiePlot, 
-  templateString) {
+], function (declare, lang, _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
   return declare("TimeChartWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
@@ -34,8 +28,17 @@ define([
       // Build a collection of fields that you can display
       var fieldsToQuery = [];
       var columns = [];
-      dataSourceConfig.selectedFieldsNames.forEach(function (field) {
-        columns.push({field: field});
+      dataSource.fields.forEach(function (field) {
+        switch (field.type) {
+          case "esriFieldTypeString":
+          case "esriFieldTypeSmallInteger":
+          case "esriFieldTypeInteger":
+          case "esriFieldTypeSingle":
+          case "esriFieldTypeDouble":
+            fieldsToQuery.push(field.name);
+            columns.push({field: field.name});
+            return;
+        }
       });
 
       // Create the grid
@@ -48,43 +51,10 @@ define([
       this.grid.startup();
 
       // Create the query object
-      var fieldsToQuery = dataSourceConfig.selectedFieldsNames.slice();
-      if (fieldsToQuery.indexOf(dataSource.objectIdFieldName) === -1)
-        fieldsToQuery.push(dataSource.objectIdFieldName);
+      fieldsToQuery.push(dataSource.objectIdFieldName);
       this.query = new Query();
       this.query.outFields = fieldsToQuery;
       this.query.returnGeometry = false;
-
-      // // x and y coordinates used for easy understanding of where they should display
-      // // Data represents website visits over a week period
-      // chartData = [
-      // { x: 1, y: 19021 },
-      // { x: 1, y: 12837 },
-      // { x: 1, y: 12378 },
-      // { x: 1, y: 21882 },
-      // { x: 1, y: 17654 },
-      // { x: 1, y: 15833 },
-      // { x: 1, y: 16122 }
-      // ];
-
-      // var pieChart = new Chart("chartNode");
- 
-      // // Set the theme
-      // pieChart.setTheme(theme);
-       
-      // // Add the only/default plot
-      // pieChart.addPlot("default", {
-      // type: PiePlot, // our plot2d/Pie module reference as type value
-      // radius: 200,
-      // fontColor: "black",
-      // labelOffset: -20
-      // });
-       
-      // // Add the series of data
-      // pieChart.addSeries("January",chartData);
-       
-      // // Render the chart!
-      // pieChart.render();
     },
 
     dataSourceExpired: function (dataSource, dataSourceConfig) {
