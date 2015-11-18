@@ -28,17 +28,8 @@ define([
       // Build a collection of fields that you can display
       var fieldsToQuery = [];
       var columns = [];
-      dataSource.fields.forEach(function (field) {
-        switch (field.type) {
-          case "esriFieldTypeString":
-          case "esriFieldTypeSmallInteger":
-          case "esriFieldTypeInteger":
-          case "esriFieldTypeSingle":
-          case "esriFieldTypeDouble":
-            fieldsToQuery.push(field.name);
-            columns.push({field: field.name});
-            return;
-        }
+      dataSourceConfig.selectedFieldsNames.forEach(function (field) {
+        columns.push({field: field});
       });
 
       // Create the grid
@@ -51,7 +42,9 @@ define([
       this.grid.startup();
 
       // Create the query object
-      fieldsToQuery.push(dataSource.objectIdFieldName);
+      var fieldsToQuery = dataSourceConfig.selectedFieldsNames.slice();
+      if (fieldsToQuery.indexOf(dataSource.objectIdFieldName) === -1)
+          fieldsToQuery.push(dataSource.objectIdFieldName);
       this.query = new Query();
       this.query.outFields = fieldsToQuery;
       this.query.returnGeometry = false;
