@@ -1,12 +1,23 @@
 <div class="table">
   <div class="table-row">
+    <input type="button" id="addDataSourceBtn" value="Add DataSource"></input>
+    <input type="button" id="clearDataSourceBtn" value="Clear"></input>
+  </div>
+  <div class="table-row full">
+    <label for="dsList" class="configLabel">
+      Data Sources:
+    </label>
+    <ol id="dsList">
+    </ol>
+  </div>
+  <!-- <div class="table-row">
     <label class="configLabel">
       Check the fields to show on the attribute table:
     </label>
-  </div>
-  <div class="table-row full">
+  </div> -->
+  <!-- <div class="table-row full">
     <div data-dojo-type="dojox.form.CheckedMultiSelect"
          data-dojo-attach-point="multiSelectDiv"
          data-dojo-attach-event="onChange:onSelectionChanged"></div>
-  </div>
+  </div> -->
 </div>
