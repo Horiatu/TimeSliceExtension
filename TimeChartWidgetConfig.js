@@ -2,6 +2,7 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/store/Memory",
+  "dojo/store/Observable",
   "dojo/ready",
   "dojo/Deferred",
   "esri/opsdashboard/core/messageHandler",
@@ -13,7 +14,7 @@ define([
   "esri/opsdashboard/WidgetConfigurationProxy",
   "dojo/text!./TimeChartWidgetConfigTemplate.html",
   "dojox/form/CheckedMultiSelect"
-], function (declare, lang, Memory, 
+], function (declare, lang, Memory, Observable,
   ready, Deferred, Msg, ErrorMessages, 
   //DataSourceProxy,
   _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
@@ -28,6 +29,26 @@ define([
           lang.hitch(this, function(dataSources) { 
               console.log(dataSources); 
               this.dataSources = dataSources;
+              dataSourceIds = [];
+              dataSourceIdsStore = new Observable(new Memory({
+                data: dataSourceIds
+              }));
+
+              var cbClick = function(e) {
+                var cb = e.currentTarget;
+                var id = cb.id;
+                if(cb.checked) {
+                  dataSourceIds.push(id);
+                }
+                else {
+                  var i = dataSourceIds.indexOf(id);
+                  if(i > -1) {
+                    dataSourceIds.splice(i,1);
+                  }
+                }
+
+                Msg._sendMessage({functionName:"readyToPersistConfig", args:{canAccept:dataSourceIds.length == 3}});
+              };
 
               var dataSourcesDiv = document.getElementById("dataSources");
               this.dataSources.forEach(function (ds) {
@@ -35,6 +56,8 @@ define([
                   var cb = document.createElement("input");
                   cb.setAttribute("type", 'checkbox');
                   cb.setAttribute("id", cbId);
+
+                  cb.addEventListener("click", lang.hitch(this, cbClick));
                   
                   var lb = document.createElement('label');
                   lb.setAttribute('for', cbId);
@@ -43,13 +66,13 @@ define([
                   dataSourcesDiv.appendChild(cb);
                   dataSourcesDiv.appendChild(lb);
                   dataSourcesDiv.appendChild(document.createElement('br'));
-
               });
 
-              // var dataSourceRowsStore = new Memory({
-              //     idProperty: "name",
-              //     data: dataSourceRows
-              // });
+
+              // get persistent ids and populate cbs
+
+
+              
 
           }),
           function(err) { console.log('error: '+err); }
@@ -70,7 +93,7 @@ define([
 
     postCreate: function () {
       this.inherited(arguments);
-      this.dataSources = new Memory({});
+      //this.dataSources = new Memory({});
    },
 
     dataSourceSelectionChanged: function (dataSource, dataSourceConfig) {
@@ -106,11 +129,11 @@ define([
     // // multiSelectDiv.
     onDataSourcesSelectionChanged: function (value) {
 
-      if (!this.dataSources)
-        return;
+      // if (!this.dataSources)
+      //   return;
 
-      this.dataSourcesConfig.selectedFieldsNames = value;
-      this.readyToPersistConfig(Array.isArray(value) && value.length == 3);
+      // this.dataSourcesConfig.selectedFieldsNames = value;
+      // this.readyToPersistConfig(Array.isArray(value) && value.length == 3);
     }
   });
 });
