@@ -1,6 +1,10 @@
 define([
   "dojo/_base/declare",
   "dojo/_base/lang",
+  "dojo/Deferred",
+  "esri/opsdashboard/core/messageHandler",
+  "esri/opsdashboard/core/errorMessages",
+  "esri/opsdashboard/DataSourceProxy",
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "esri/opsdashboard/WidgetProxy",
@@ -9,15 +13,44 @@ define([
   "esri/tasks/query",
   "dgrid/OnDemandGrid",
   "dojo/text!./TimeChartWidgetTemplate.html"
-], function (declare, lang, _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
+], function (declare, lang, 
+  Deferred, Msg, ErrorMessages, 
+  DataSourceProxy,
+  _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
   return declare("TimeChartWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
     templateString: templateString,
     debugName: "TimeChartWidget",
 
-    hostReady: function () {
+    getDataSourceProxies: function() {
+        return !this._isHostInitialized() 
+        ? (new Deferred).reject(Error(ErrorMessages.hostNotReady)) 
+        : Msg._sendMessageWithReply({functionName: "getDataSources"}).then(lang.hitch(this, function(a) {
+            //return (new Deferred).resolve(a.dataSources);
+            this._dataSourceProxies = {};
+            return a.dataSources.map(function(a) {
+                return this._dataSourceProxies[a.id] = new DataSourceProxy(a);
+            }, this)
+        }))
+    },
 
-      // Create the store you will use to display the features in the grid
+    DataSources: [],
+    hostReady: function () {
+      
+      this.getDataSourceProxies().then(
+          lang.hitch(this, function(dataSources) {
+              DataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
+              console.log(DataSources);
+              DataSources.forEach(function(ds) {
+
+              });
+
+          }),
+      
+          function(err) { console.log('error: '+err); }
+      ),
+
+      // Create the store we will use to display the features in the grid
       this.store = new Observable(new Memory());
 
       // Get from the data source and the associated data source config
@@ -25,11 +58,20 @@ define([
       var dataSource = this.dataSourceProxies[0];
       var dataSourceConfig = this.getDataSourceConfig(dataSource);
 
-      // Build a collection of fields that you can display
+      // Build a collection of fields that we can display
       var fieldsToQuery = [];
       var columns = [];
-      dataSourceConfig.selectedFieldsNames.forEach(function (field) {
-        columns.push({field: field});
+      dataSource.fields.forEach(function (field) {
+        switch (field.type) {
+          case "esriFieldTypeString":
+          case "esriFieldTypeSmallInteger":
+          case "esriFieldTypeInteger":
+          case "esriFieldTypeSingle":
+          case "esriFieldTypeDouble":
+            fieldsToQuery.push(field.name);
+            columns.push({field: field.name});
+            return;
+        }
       });
 
       // Create the grid
@@ -42,26 +84,67 @@ define([
       this.grid.startup();
 
       // Create the query object
-      var fieldsToQuery = dataSourceConfig.selectedFieldsNames.slice();
-      if (fieldsToQuery.indexOf(dataSource.objectIdFieldName) === -1)
-          fieldsToQuery.push(dataSource.objectIdFieldName);
+      fieldsToQuery.push(dataSource.objectIdFieldName);
       this.query = new Query();
       this.query.outFields = fieldsToQuery;
       this.query.returnGeometry = false;
     },
 
     dataSourceExpired: function (dataSource, dataSourceConfig) {
+      //alert(0);
+      console.log(dataSource.name);
+      console.log(this.DataSources);
 
+      this.getDataSourceProxies().then(
+        function(dataSources) {
+          dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
+          //console.log(dataSources);
+          var today=new Date();
+          //console.log(today.toJSON().slice(0,10));
+          prevDates = {};
+          for(var i=1; i<=4; i++) {
+              var j=i*30;
+              prevDates[j]={ date: new Date(today.setDate(today.getDate()-j)), count:0};
+          }
+          
+          dataSources.forEach(function(ds) {
+            console.log(ds.name);
+            ds.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
+              //console.log(featureSet.features);
+
+              featureSet.features.forEach(function(f){
+                  var CreationDate = new Date(f.attributes.CreationDate);
+                  var BreakException = {};
+                  try {
+                      for(var k in prevDates) {
+                          if(CreationDate > prevDates[k].date) {
+                              prevDates[k].count++;
+                              throw BreakException;
+                          }
+                      }
+                  } catch(e) {
+                      if (e!==BreakException) throw e;
+                  }
+              })
+            }));
+          })
+          console.log(prevDates);
+        }
+      );
       // Execute the query. A request will be sent to the server to query for the features.
       // The results are in the featureSet
-      dataSource.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
+      this.DataSources.forEach(function(ds) {
+        console.log(ds.name)
+        //dataSource
+        ds.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
 
-        // Show the name of the data source and the number of features returned from the query
-        this.updateDataSourceInfoLabel(dataSource.name, featureSet);
+          // Show the name of the data source and the number of features returned from the query
+          this.updateDataSourceInfoLabel(ds.name, featureSet);
 
-        // Show the features in the table
-        this.updateAttributeTable(featureSet, dataSource);
-      }));
+          // Show the features in the table
+          this.updateAttributeTable(featureSet, ds);
+        }))
+      });
     },
 
     updateDataSourceInfoLabel: function (dataSourceName, featureSet) {
@@ -73,6 +156,7 @@ define([
         dataSourceInfo += " has no feature";
       else
         dataSourceInfo += " has " + featureCount + " features";
+      console.log(dataSourceInfo);
 
       this.infoLabel.innerHTML = dataSourceInfo;
     },
