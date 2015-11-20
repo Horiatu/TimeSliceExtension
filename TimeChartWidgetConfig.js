@@ -2,8 +2,11 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/store/Memory",
-  "dojox/storage",
   "dojo/ready",
+  "dojo/Deferred",
+  "esri/opsdashboard/core/messageHandler",
+  "esri/opsdashboard/core/errorMessages",
+  //"esri/opsdashboard/DataSourceProxy",
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "dijit/_WidgetsInTemplateMixin",
@@ -11,29 +14,35 @@ define([
   "dojo/text!./TimeChartWidgetConfigTemplate.html",
   "dojox/form/CheckedMultiSelect"
 ], function (declare, lang, Memory, 
-  Storage, ready,
+  ready, Deferred, Msg, ErrorMessages, //DataSourceProxy,
   _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
   WidgetConfigurationProxy, templateString) {
-
-    ready(function(){
-      dojox.storage.manager.initialize();
-      this.storageProvider = dojox.storage.manager.getProvider();
-      this.storageProvider.initialize();
-      var results = this.storageProvider.get("TimeChartDataSources");
-      console.log(results);
-
-      var dsList = document.getElementById("dsList");
-      results.data.forEach(function(ds) {
-        var li = document.createElement("li");
-        li.appendChild(document.createTextNode(ds.name));
-        li.setAttribute("id", ds.dataSourceId);
-        dsList.appendChild(li);      
-      })
-    });
 
     return declare("TimeChartWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, 
       WidgetConfigurationProxy], {
       templateString: templateString,
+
+    hostReady: function(){
+      this.getDataSourceProxies().then(
+          function(dataSources) { console.log(dataSources); },
+          function(err) { console.log('error: '+err); }
+      );
+      // var dsList = document.getElementById("dsList");
+      // results.data.forEach(function(ds) {
+      //   var li = document.createElement("li");
+      //   li.appendChild(document.createTextNode(ds.name));
+      //   li.setAttribute("id", ds.dataSourceId);
+      //   dsList.appendChild(li);      
+      // })
+    },
+
+    getDataSourceProxies: function() {
+        return !this._isHostInitialized() 
+        ? (new Deferred).reject(Error(ErrorMessages.hostNotReady)) 
+        : Msg._sendMessageWithReply({functionName: "getDataSources"}).then(lang.hitch(this, function(a) {
+            return (new Deferred).resolve(a.dataSources);
+        }))
+    },
 
     postCreate: function () {
       this.inherited(arguments);
@@ -55,9 +64,13 @@ define([
             if(this.dataSources.data.length == 3) {
               //console.log(this.dataSources);
               // make it persistent
-              storageProvider.put("TimeChartDataSources", this.dataSources, function(status, keyName){
-                console.log(status+" value put in "+keyName);
-              });
+              // storageProvider.put("TimeChartDataSources", this.dataSources, function(status, keyName){
+              //   console.log(status+" value put in "+keyName);
+              // });
+
+              this.config.propertyIWantoSave = "TimeChartDataSources";
+              this.dataSourceConfig.xField = this.dataSources;
+              this.readyToPersistConfig(true);
             }
           }
         }
@@ -67,6 +80,7 @@ define([
         var dsList =document.getElementById("dsList");
         dsList.innerHTML = null;
         this.dataSources = new Memory({});
+        this.readyToPersistConfig(false);
       }));
     },
 
@@ -75,6 +89,10 @@ define([
       this.dataSource = dataSource;
       this.dataSourceConfig = dataSourceConfig;
 
+      // this.getDataSourceProxies().then(
+      //     function(r) { console.log(r); },
+      //     function(r) { console.log('error: '+r); }
+      // ),
 
          
       // var alphaNumericFields = [];
@@ -103,12 +121,13 @@ define([
     },
 
     // // multiSelectDiv.
-    // onSelectionChanged: function (value) {
-    //   if (!this.dataSourceConfig)
-    //     return;
+    onSelectionChanged: function (value) {
 
-    //   this.dataSourceConfig.selectedFieldsNames = value;
-    //   this.readyToPersistConfig(Array.isArray(value) && value.length > 0);
-    // }
+      // if (!this.dataSourceConfig)
+      //   return;
+
+      // this.dataSourceConfig.selectedFieldsNames = value;
+      // this.readyToPersistConfig(Array.isArray(value) && value.length > 0);
+    }
   });
 });

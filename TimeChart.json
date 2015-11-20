@@ -9,7 +9,7 @@
 	},
 	"configuration": {
 		"path": "TimeChartConfig.html",
-		"requireDataSource": true
+		"requireDataSource": false
 	},
 	"credits": "Esri"
 }
