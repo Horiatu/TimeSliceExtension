@@ -83,14 +83,14 @@ define([
       this.query = new Query();
       this.query.outFields = "*";
       this.query.returnGeometry = false;
-      console.log(this.query);
+      //console.log(this.query);
     },
 
     getContsByDates : function(dataSources) {
       dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
-      console.log(dataSources);
+      //console.log(dataSources);
       
-      this.document.getElementById('countList').innerHTML = '';
+      //this.document.getElementById('countList').innerHTML = '';
 
       var executeQuery = function(ds, query) {
         return Msg._sendMessageWithReply({
@@ -114,7 +114,7 @@ define([
           )
       };
 
-      var exec = function(dfr1) {
+      var exec = function(dfr) {
         var today=new Date();
 
         var query = new Query();
@@ -124,54 +124,54 @@ define([
         var prevDates = {};
         for(var i=1; i<=4; i++) {
             var j=i*30;
-            prevDates[j]={ date: new Date().addDays(-j), count:0};
+            prevDates[j]={ date: new Date().addDays(-j), count:0, features:[]};
         }
         
         var getSumCounts = function(dfr, dataSources) {
-          if(!dataSources || dataSources.length <= 0) {
-            dfr.resolve(prevDates);
+          if(dataSources && dataSources.length > 0) {
+            executeQuery(dataSources.pop(), query).then(
+              lang.hitch(this, function (featureSet) {
+                //console.log(featureSet.features);
+
+                featureSet.features.forEach(function(f){
+                    var CreationDate = new Date(f.attributes.CreationDate);
+                    var BreakException = {};
+                    try {
+                        for(var k in prevDates) {
+                            if(CreationDate > prevDates[k].date) {
+                                prevDates[k].features.push(f.attributes.objectid);
+                                prevDates[k].count++;
+                                throw BreakException;
+                            }
+                        }
+                    } catch(e) {
+                        if (e!==BreakException) throw e;
+                    }
+                })
+              }),
+              function(err) { 
+                console.log(err.error.code + ": " + err.error.description);
+              }
+            ).always(function() {
+              if(dataSources.length > 0) {
+                getSumCounts(dfr, dataSources);
+              }
+              else {
+                dfr.resolve(prevDates);
+              }
+            });
           }
-
-          var ds = dataSources.pop();
-          executeQuery(ds, query)
-          .then(
-            lang.hitch(this, function (featureSet) {
-              console.log(featureSet.features);
-
-              featureSet.features.forEach(function(f){
-                  var CreationDate = new Date(f.attributes.CreationDate);
-                  var BreakException = {};
-                  try {
-                      for(var k in prevDates) {
-                          if(CreationDate > prevDates[k].date) {
-                              prevDates[k].count++;
-                              throw BreakException;
-                          }
-                      }
-                  } catch(e) {
-                      if (e!==BreakException) throw e;
-                  }
-              })
-            }),
-            function(err) { 
-              console.log(err.error.code + ": " + err.error.description);
-            }
-          )
-          .always(function() {
-            getSumCounts(dfr, dataSources);
-          });
 
           return dfr;
         };
 
         getSumCounts(new Deferred, dataSources).then(function() {
-          dfr1.resolve(prevDates);
+          dfr.resolve(prevDates);
         });
-        return dfr1;
+        return dfr;
       };
 
-      exec(new Deferred)
-        .then(function(prevDates) {
+      exec(new Deferred).then(function(prevDates) {
 
           console.log(prevDates);
 
@@ -187,14 +187,14 @@ define([
             var li = this.document.createElement('li');
             li.appendChild(document.createTextNode(countsStr));
             countList.appendChild(li);
-            console.log(countsStr);
+            //console.log(countsStr);
           };
       })
     },
 
     dataSourceExpired: function (dataSource, dataSourceConfig) {
       //alert(0);
-      console.log(dataSource.name);
+      //console.log(dataSource.name);
       
       this.getDataSourceProxies().then( this.getContsByDates );
       // // Execute the query. A request will be sent to the server to query for the features.
