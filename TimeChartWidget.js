@@ -89,50 +89,52 @@ define([
     getContsByDates : function(dataSources) {
       dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
       console.log(dataSources);
-      var last = "0";
       
       this.document.getElementById('countList').innerHTML = '';
 
-      var exec = function(dfr) {
-        var executeQuery = function(ds, query) {
-          return Msg._sendMessageWithReply({
-            functionName: "executeQuery",
-            args: {
-              dataSourceId: ds.id,
-              query: query
-            }
-            }).then(
-              lang.hitch(this, function(result) {
-                //this.isBroken = !1;
-                if(result.cancel==true) {
-                  throw {error:{code:"cancel", description:ds.id}};
-                }
-                return new FeatureSet(result.featureSet)
-              }), 
-              lang.hitch(this, function(err) {
-                //this.isBroken = !0;
-                throw err;
-              })
-            )
-        };
+      var executeQuery = function(ds, query) {
+        return Msg._sendMessageWithReply({
+          functionName: "executeQuery",
+          args: {
+            dataSourceId: ds.id,
+            query: query
+          }
+          }).then(
+            lang.hitch(this, function(result) {
+              //this.isBroken = !1;
+              if(result.cancel==true) {
+                throw {error:{code:"cancel", description:ds.id}};
+              }
+              return new FeatureSet(result.featureSet)
+            }), 
+            lang.hitch(this, function(err) {
+              //this.isBroken = !0;
+              throw err;
+            })
+          )
+      };
 
+      var exec = function(dfr1) {
         var today=new Date();
+
+        var query = new Query();
+        query.outFields = ["objectid", "CreationDate"];
+        query.returnGeometry = false;
 
         var prevDates = {};
         for(var i=1; i<=4; i++) {
             var j=i*30;
             prevDates[j]={ date: new Date().addDays(-j), count:0};
         }
+        
+        var getSumCounts = function(dfr, dataSources) {
+          if(!dataSources || dataSources.length <= 0) {
+            dfr.resolve(prevDates);
+          }
 
-        var query = new Query();
-        query.outFields = ["objectid", "CreationDate"];
-        query.returnGeometry = false;
-
-        var n = dataSources.length;
-
-        dataSources.forEach(function(ds) {
-
-          executeQuery(ds, query).then(
+          var ds = dataSources.pop();
+          executeQuery(ds, query)
+          .then(
             lang.hitch(this, function (featureSet) {
               console.log(featureSet.features);
 
@@ -153,32 +155,41 @@ define([
             }),
             function(err) { 
               console.log(err.error.code + ": " + err.error.description);
-              //console.log(query); 
             }
-          ).always(function() {
-              if(--n==0) dfr.resolve(prevDates);
-          })
-        });
-        return dfr;
+          )
+          .always(function() {
+            getSumCounts(dfr, dataSources);
+          });
 
-      }(new Deferred).then(function(prevDates) {
-
-        console.log(prevDates);
-
-        var countList = this.document.getElementById('countList');
-        countList.innerHTML = '';
-        for(var cnt in prevDates) {
-          var countsStr = last + " to " + cnt + ": " 
-          //+ prevDates[cnt].date+ "   " 
-          + prevDates[cnt].count;
-          last = cnt;
-
-          var li = this.document.createElement('li');
-          li.appendChild(document.createTextNode(countsStr));
-          countList.appendChild(li);
-          console.log(countsStr);
+          return dfr;
         };
-      });
+
+        getSumCounts(new Deferred, dataSources).then(function() {
+          dfr1.resolve(prevDates);
+        });
+        return dfr1;
+      };
+
+      exec(new Deferred)
+        .then(function(prevDates) {
+
+          console.log(prevDates);
+
+          var countList = this.document.getElementById('countList');
+          countList.innerHTML = '';
+          var last = "0";
+          for(var cnt in prevDates) {
+            var countsStr = last + " to " + cnt + ": " 
+            //+ prevDates[cnt].date+ "   " 
+            + prevDates[cnt].count;
+            last = cnt;
+
+            var li = this.document.createElement('li');
+            li.appendChild(document.createTextNode(countsStr));
+            countList.appendChild(li);
+            console.log(countsStr);
+          };
+      })
     },
 
     dataSourceExpired: function (dataSource, dataSourceConfig) {
