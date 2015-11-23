@@ -5,6 +5,7 @@ define([
   "esri/opsdashboard/core/messageHandler",
   "esri/opsdashboard/core/errorMessages",
   "esri/opsdashboard/DataSourceProxy",
+  "esri/tasks/FeatureSet",
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "esri/opsdashboard/WidgetProxy",
@@ -15,7 +16,7 @@ define([
   "dojo/text!./TimeChartWidgetTemplate.html"
 ], function (declare, lang, 
   Deferred, Msg, ErrorMessages, 
-  DataSourceProxy,
+  DataSourceProxy, FeatureSet,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
   return declare("TimeChartWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
@@ -34,83 +35,106 @@ define([
         }))
     },
 
-    DataSources: [],
     hostReady: function () {
+      Date.prototype.addDays = function (n) {
+        var time = this.getTime();
+        var changedDate = new Date(time + (n * 24 * 60 * 60 * 1000));
+        this.setTime(changedDate.getTime());
+        return this;
+      };
       
-      this.getDataSourceProxies().then(
-          lang.hitch(this, function(dataSources) {
-              DataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
-              console.log(DataSources);
-              DataSources.forEach(function(ds) {
+      // this.getDataSourceProxies().then( this.getContsByDates );
 
-              });
+      // // Create the store we will use to display the features in the grid
+      // this.store = new Observable(new Memory());
 
-          }),
-      
-          function(err) { console.log('error: '+err); }
-      ),
+      // // Get from the data source and the associated data source config
+      // // The dataSourceConfig stores the fields selected by the operation view publisher during configuration
+      // var dataSource = this.dataSourceProxies[0];
+      // var dataSourceConfig = this.getDataSourceConfig(dataSource);
 
-      // Create the store we will use to display the features in the grid
-      this.store = new Observable(new Memory());
+      // // Build a collection of fields that we can display
+      // var fieldsToQuery = [];
+      // var columns = [];
+      // dataSource.fields.forEach(function (field) {
+      //   switch (field.type) {
+      //     case "esriFieldTypeString":
+      //     case "esriFieldTypeSmallInteger":
+      //     case "esriFieldTypeInteger":
+      //     case "esriFieldTypeSingle":
+      //     case "esriFieldTypeDouble":
+      //       fieldsToQuery.push(field.name);
+      //       columns.push({field: field.name});
+      //       return;
+      //   }
+      // });
 
-      // Get from the data source and the associated data source config
-      // The dataSourceConfig stores the fields selected by the operation view publisher during configuration
-      var dataSource = this.dataSourceProxies[0];
-      var dataSourceConfig = this.getDataSourceConfig(dataSource);
+      // // Create the grid
+      // this.grid = new Grid({
+      //   store: this.store,
+      //   cleanEmptyObservers: false,
+      //   columns: columns
+      // }, this.gridDiv);
 
-      // Build a collection of fields that we can display
-      var fieldsToQuery = [];
-      var columns = [];
-      dataSource.fields.forEach(function (field) {
-        switch (field.type) {
-          case "esriFieldTypeString":
-          case "esriFieldTypeSmallInteger":
-          case "esriFieldTypeInteger":
-          case "esriFieldTypeSingle":
-          case "esriFieldTypeDouble":
-            fieldsToQuery.push(field.name);
-            columns.push({field: field.name});
-            return;
-        }
-      });
-
-      // Create the grid
-      this.grid = new Grid({
-        store: this.store,
-        cleanEmptyObservers: false,
-        columns: columns
-      }, this.gridDiv);
-
-      this.grid.startup();
+      // this.grid.startup();
 
       // Create the query object
-      fieldsToQuery.push(dataSource.objectIdFieldName);
+      //fieldsToQuery.push(dataSource.objectIdFieldName);
       this.query = new Query();
-      this.query.outFields = fieldsToQuery;
+      this.query.outFields = "*";
       this.query.returnGeometry = false;
+      console.log(this.query);
     },
 
-    dataSourceExpired: function (dataSource, dataSourceConfig) {
-      //alert(0);
-      console.log(dataSource.name);
-      console.log(this.DataSources);
+    getContsByDates : function(dataSources) {
+      dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
+      console.log(dataSources);
+      var last = "0";
+      
+      this.document.getElementById('countList').innerHTML = '';
 
-      this.getDataSourceProxies().then(
-        function(dataSources) {
-          dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
-          //console.log(dataSources);
-          var today=new Date();
-          //console.log(today.toJSON().slice(0,10));
-          prevDates = {};
-          for(var i=1; i<=4; i++) {
-              var j=i*30;
-              prevDates[j]={ date: new Date(today.setDate(today.getDate()-j)), count:0};
-          }
-          
-          dataSources.forEach(function(ds) {
-            console.log(ds.name);
-            ds.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
-              //console.log(featureSet.features);
+      var exec = function(dfr) {
+        var executeQuery = function(ds, query) {
+          return Msg._sendMessageWithReply({
+            functionName: "executeQuery",
+            args: {
+              dataSourceId: ds.id,
+              query: query
+            }
+            }).then(
+              lang.hitch(this, function(result) {
+                //this.isBroken = !1;
+                if(result.cancel==true) {
+                  throw {error:{code:"cancel", description:ds.id}};
+                }
+                return new FeatureSet(result.featureSet)
+              }), 
+              lang.hitch(this, function(err) {
+                //this.isBroken = !0;
+                throw err;
+              })
+            )
+        };
+
+        var today=new Date();
+
+        var prevDates = {};
+        for(var i=1; i<=4; i++) {
+            var j=i*30;
+            prevDates[j]={ date: new Date().addDays(-j), count:0};
+        }
+
+        var query = new Query();
+        query.outFields = ["objectid", "CreationDate"];
+        query.returnGeometry = false;
+
+        var n = dataSources.length;
+
+        dataSources.forEach(function(ds) {
+
+          executeQuery(ds, query).then(
+            lang.hitch(this, function (featureSet) {
+              console.log(featureSet.features);
 
               featureSet.features.forEach(function(f){
                   var CreationDate = new Date(f.attributes.CreationDate);
@@ -126,47 +150,78 @@ define([
                       if (e!==BreakException) throw e;
                   }
               })
-            }));
+            }),
+            function(err) { 
+              console.log(err.error.code + ": " + err.error.description);
+              //console.log(query); 
+            }
+          ).always(function() {
+              if(--n==0) dfr.resolve(prevDates);
           })
-          console.log(prevDates);
-        }
-      );
-      // Execute the query. A request will be sent to the server to query for the features.
-      // The results are in the featureSet
-      this.DataSources.forEach(function(ds) {
-        console.log(ds.name)
-        //dataSource
-        ds.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
+        });
+        return dfr;
 
-          // Show the name of the data source and the number of features returned from the query
-          this.updateDataSourceInfoLabel(ds.name, featureSet);
+      }(new Deferred).then(function(prevDates) {
 
-          // Show the features in the table
-          this.updateAttributeTable(featureSet, ds);
-        }))
+        console.log(prevDates);
+
+        var countList = this.document.getElementById('countList');
+        countList.innerHTML = '';
+        for(var cnt in prevDates) {
+          var countsStr = last + " to " + cnt + ": " 
+          //+ prevDates[cnt].date+ "   " 
+          + prevDates[cnt].count;
+          last = cnt;
+
+          var li = this.document.createElement('li');
+          li.appendChild(document.createTextNode(countsStr));
+          countList.appendChild(li);
+          console.log(countsStr);
+        };
       });
     },
 
-    updateDataSourceInfoLabel: function (dataSourceName, featureSet) {
+    dataSourceExpired: function (dataSource, dataSourceConfig) {
+      //alert(0);
+      console.log(dataSource.name);
+      
+      this.getDataSourceProxies().then( this.getContsByDates );
+      // // Execute the query. A request will be sent to the server to query for the features.
+      // // The results are in the featureSet
+      // this.DataSources.forEach(function(ds) {
+      //   console.log(ds.name)
+      //   //dataSource
+      //   ds.executeQuery(this.query).then(lang.hitch(this, function (featureSet) {
 
-      // Compose the correct string to display
-      var dataSourceInfo = dataSourceName;
-      var featureCount = featureSet.features.length;
-      if (featureCount === 0)
-        dataSourceInfo += " has no feature";
-      else
-        dataSourceInfo += " has " + featureCount + " features";
-      console.log(dataSourceInfo);
+      //     // Show the name of the data source and the number of features returned from the query
+      //     this.updateDataSourceInfoLabel(ds.name, featureSet);
 
-      this.infoLabel.innerHTML = dataSourceInfo;
+      //     //// Show the features in the table
+      //     //this.updateAttributeTable(featureSet, ds);
+      //   }))
+      // });
     },
 
-    updateAttributeTable: function (featureSet, dataSource) {
-      // For each feature put them in the store and overwrite any existing
-      // Potential improvement: Remove from the store the features that were not part of this update.
-      featureSet.features.forEach(lang.hitch(this, function (feature) {
-        this.store.put(feature.attributes, {overwrite: true, id: feature.attributes[dataSource.objectIdFieldName]});
-      }));
-    }
+    // updateDataSourceInfoLabel: function (dataSourceName, featureSet) {
+
+    //   // Compose the correct string to display
+    //   var dataSourceInfo = dataSourceName;
+    //   var featureCount = featureSet.features.length;
+    //   if (featureCount === 0)
+    //     dataSourceInfo += " has no feature";
+    //   else
+    //     dataSourceInfo += " has " + featureCount + " features";
+    //   console.log(dataSourceInfo);
+
+    //   this.infoLabel.innerHTML = dataSourceInfo;
+    // },
+
+    // updateAttributeTable: function (featureSet, dataSource) {
+    //   // For each feature put them in the store and overwrite any existing
+    //   // Potential improvement: Remove from the store the features that were not part of this update.
+    //   featureSet.features.forEach(lang.hitch(this, function (feature) {
+    //     this.store.put(feature.attributes, {overwrite: true, id: feature.attributes[dataSource.objectIdFieldName]});
+    //   }));
+    // }
   });
 });
