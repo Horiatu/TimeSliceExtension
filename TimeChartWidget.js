@@ -26,7 +26,6 @@ define([
 ], function (declare, lang, 
   Deferred, Msg, ErrorMessages, 
   DataSourceProxy, FeatureSet,
-  //
   Chart2D, Pie, Highlight, MoveSlice, 
   Tooltip, CubanShirts, Claro, SelectableLegend, Legend,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
@@ -47,8 +46,6 @@ define([
         }))
     },
 
-    chart: null,
-
     hostReady: function () {
       Date.prototype.addDays = function (n) {
         var time = this.getTime();
@@ -57,16 +54,17 @@ define([
         return this;
       };
       
+      colors= ["#a08bdd", "#c7b85e", "#af95ff", "#67a966", "#99c044"];
       chart = new dojox.charting.Chart2D("reportChartDiv");
       chart.addPlot("default", {
           type: "Pie",
-          radius: 130,
+          radius: 110,
           labelOffset: 0,
           shadow:false,
           stroke:"white",
           labelWiring: "blue",
           labelStyle: "columns"
-      }).setTheme(dojox.charting.themes.Claro);
+      }).setTheme(dojox.charting.themes.CubanShirts);
 
       var a1 = new dojox.charting.action2d.Tooltip(chart, "default");
       var a = new dojox.charting.action2d.MoveSlice(chart, "default", {
@@ -77,7 +75,6 @@ define([
 
       var a2 = new dojox.charting.action2d.Highlight(chart, "default");
 
-
       chart.render();
 
       // var selectableLegend = new dojox.charting.widget.SelectableLegend({
@@ -86,47 +83,6 @@ define([
       //     horizontal: true
       // }, "reportChartLegendDiv");
 
-      // this.getDataSourceProxies().then( this.getContsByDates );
-
-      // // Create the store we will use to display the features in the grid
-      // this.store = new Observable(new Memory());
-
-      // // Get from the data source and the associated data source config
-      // // The dataSourceConfig stores the fields selected by the operation view publisher during configuration
-      // var dataSource = this.dataSourceProxies[0];
-      // var dataSourceConfig = this.getDataSourceConfig(dataSource);
-
-      // // Build a collection of fields that we can display
-      // var fieldsToQuery = [];
-      // var columns = [];
-      // dataSource.fields.forEach(function (field) {
-      //   switch (field.type) {
-      //     case "esriFieldTypeString":
-      //     case "esriFieldTypeSmallInteger":
-      //     case "esriFieldTypeInteger":
-      //     case "esriFieldTypeSingle":
-      //     case "esriFieldTypeDouble":
-      //       fieldsToQuery.push(field.name);
-      //       columns.push({field: field.name});
-      //       return;
-      //   }
-      // });
-
-      // // Create the grid
-      // this.grid = new Grid({
-      //   store: this.store,
-      //   cleanEmptyObservers: false,
-      //   columns: columns
-      // }, this.gridDiv);
-
-      // this.grid.startup();
-
-      // Create the query object
-      //fieldsToQuery.push(dataSource.objectIdFieldName);
-      this.query = new Query();
-      this.query.outFields = "*";
-      this.query.returnGeometry = false;
-      //console.log(this.query);
     },
 
     getContsByDates : function(dataSources) {
@@ -218,12 +174,12 @@ define([
 
           console.log(prevDates);
 
-          // var countList = this.document.getElementById('countList');
-          // countList.innerHTML = '';
+          var countList = this.document.getElementById('countList');
+          countList.innerHTML = '';
           var last = "0";
 
           var dsnArr=[];
-          var colors=["#a08bdd", "#c7b85e", "#af95ff", "#67a966", "#99c044"]
+          
           var c = 0;
 
           var total = 0;
@@ -232,24 +188,29 @@ define([
           }
 
           for(var cnt in prevDates) {
-            var countsStr = ((last=="0") ? "&nbsp;less than " : (last + " to ")) + cnt + " days ";
+            var countsStr = ((last=="0") ? " less than " : (" "+last + " to ")) + cnt + " days ";
             
             last = cnt;
 
-            // var li = this.document.createElement('li');
-            // li.appendChild(document.createTextNode(countsStr));
-            // countList.appendChild(li);
-            // //console.log(countsStr);
-
             if(prevDates[cnt].count>0){
+              var li = this.document.createElement('li');
+              li.className = 'legend';
+              var m = document.createElement('div');
+              m.style['background-color']=colors[c];
+
+              li.appendChild(m);
+              li.appendChild(document.createTextNode(countsStr+"  -  "+prevDates[cnt].count));
+              countList.appendChild(li);
+
               dsnArr.push( {
                 y: prevDates[cnt].count,
                 text: (prevDates[cnt].count/total*100).toFixed(1)+"%",
                 tooltip: countsStr +" : "+prevDates[cnt].count,
                 fontSize: 14,
                 fontColor: 'black',
-                color: colors[c++]
+                color: colors[c]
                 });
+              c = (c+1) % colors.length;
             }
           };
           chart.addSeries("DSN", dsnArr);

@@ -50,3 +50,13 @@ label{
 .dijitInline.dojoxMultiSelectItemLabel, .dijitInline.dijitCheckBox {
   display: inline;
 }
+
+.legend {
+  list-style-type: none;
+}
+
+.legend div {
+  height: 14px;
+  width: 20px;
+  display: inline-block;
+}
