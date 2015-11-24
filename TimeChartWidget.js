@@ -12,9 +12,9 @@ define([
   "dojox/charting/action2d/MoveSlice",
   "dojox/charting/action2d/Tooltip",
   "dojox/charting/themes/CubanShirts",
-  "dojox/charting/themes/Claro",
-  "dojox/charting/widget/SelectableLegend",
-  "dojox/charting/widget/Legend",  
+  //"dojox/charting/themes/Claro",
+  //"dojox/charting/widget/SelectableLegend",
+  //"dojox/charting/widget/Legend",  
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "esri/opsdashboard/WidgetProxy",
@@ -27,7 +27,8 @@ define([
   Deferred, Msg, ErrorMessages, 
   DataSourceProxy, FeatureSet,
   Chart2D, Pie, Highlight, MoveSlice, 
-  Tooltip, CubanShirts, Claro, SelectableLegend, Legend,
+  Tooltip, CubanShirts, 
+  //Claro, SelectableLegend, Legend,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
   return declare("TimeChartWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {

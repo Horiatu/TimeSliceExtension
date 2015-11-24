@@ -53,10 +53,13 @@ label{
 
 .legend {
   list-style-type: none;
+  font-size: 14px;
+  margin-right: 20px;
 }
 
 .legend div {
   height: 14px;
   width: 20px;
   display: inline-block;
+  vertical-align: baseline;
 }
