@@ -6,6 +6,15 @@ define([
   "esri/opsdashboard/core/errorMessages",
   "esri/opsdashboard/DataSourceProxy",
   "esri/tasks/FeatureSet",
+  "dojox/charting/Chart2D",
+  "dojox/charting/plot2d/Pie",
+  "dojox/charting/action2d/Highlight",
+  "dojox/charting/action2d/MoveSlice",
+  "dojox/charting/action2d/Tooltip",
+  "dojox/charting/themes/CubanShirts",
+  "dojox/charting/themes/Claro",
+  "dojox/charting/widget/SelectableLegend",
+  "dojox/charting/widget/Legend",  
   "dijit/_WidgetBase",
   "dijit/_TemplatedMixin",
   "esri/opsdashboard/WidgetProxy",
@@ -17,6 +26,9 @@ define([
 ], function (declare, lang, 
   Deferred, Msg, ErrorMessages, 
   DataSourceProxy, FeatureSet,
+  //
+  Chart2D, Pie, Highlight, MoveSlice, 
+  Tooltip, CubanShirts, Claro, SelectableLegend, Legend,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
   return declare("TimeChartWidget", [_WidgetBase, _TemplatedMixin, WidgetProxy], {
@@ -35,6 +47,8 @@ define([
         }))
     },
 
+    chart: null,
+
     hostReady: function () {
       Date.prototype.addDays = function (n) {
         var time = this.getTime();
@@ -43,6 +57,35 @@ define([
         return this;
       };
       
+      chart = new dojox.charting.Chart2D("reportChartDiv");
+      chart.addPlot("default", {
+          type: "Pie",
+          radius: 130,
+          labelOffset: 0,
+          shadow:false,
+          stroke:"white",
+          labelWiring: "blue",
+          labelStyle: "columns"
+      }).setTheme(dojox.charting.themes.Claro);
+
+      var a1 = new dojox.charting.action2d.Tooltip(chart, "default");
+      var a = new dojox.charting.action2d.MoveSlice(chart, "default", {
+          duration: 200,
+          scale: 1.1,
+          shift: 10
+      });
+
+      var a2 = new dojox.charting.action2d.Highlight(chart, "default");
+
+
+      chart.render();
+
+      // var selectableLegend = new dojox.charting.widget.SelectableLegend({
+      //     chart: chart,
+      //     outline: false,
+      //     horizontal: true
+      // }, "reportChartLegendDiv");
+
       // this.getDataSourceProxies().then( this.getContsByDates );
 
       // // Create the store we will use to display the features in the grid
@@ -122,8 +165,8 @@ define([
         query.returnGeometry = false;
 
         var prevDates = {};
-        for(var i=1; i<=4; i++) {
-            var j=i*30;
+        for(var i=1; i<=8; i++) {
+            var j=i*10;
             prevDates[j]={ date: new Date().addDays(-j), count:0, features:[]};
         }
         
@@ -175,20 +218,42 @@ define([
 
           console.log(prevDates);
 
-          var countList = this.document.getElementById('countList');
-          countList.innerHTML = '';
+          // var countList = this.document.getElementById('countList');
+          // countList.innerHTML = '';
           var last = "0";
+
+          var dsnArr=[];
+          var colors=["#a08bdd", "#c7b85e", "#af95ff", "#67a966", "#99c044"]
+          var c = 0;
+
+          var total = 0;
           for(var cnt in prevDates) {
-            var countsStr = last + " to " + cnt + ": " 
-            //+ prevDates[cnt].date+ "   " 
-            + prevDates[cnt].count;
+            total += prevDates[cnt].count;
+          }
+
+          for(var cnt in prevDates) {
+            var countsStr = ((last=="0") ? "&nbsp;less than " : (last + " to ")) + cnt + " days ";
+            
             last = cnt;
 
-            var li = this.document.createElement('li');
-            li.appendChild(document.createTextNode(countsStr));
-            countList.appendChild(li);
-            //console.log(countsStr);
+            // var li = this.document.createElement('li');
+            // li.appendChild(document.createTextNode(countsStr));
+            // countList.appendChild(li);
+            // //console.log(countsStr);
+
+            if(prevDates[cnt].count>0){
+              dsnArr.push( {
+                y: prevDates[cnt].count,
+                text: (prevDates[cnt].count/total*100).toFixed(1)+"%",
+                tooltip: countsStr +" : "+prevDates[cnt].count,
+                fontSize: 14,
+                fontColor: 'black',
+                color: colors[c++]
+                });
+            }
           };
+          chart.addSeries("DSN", dsnArr);
+          chart.render();
       })
     },
 
