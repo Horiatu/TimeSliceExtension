@@ -12,6 +12,7 @@ define([
   "dojox/charting/action2d/MoveSlice",
   "dojox/charting/action2d/Tooltip",
   "dojox/charting/themes/CubanShirts",
+  //"dojo/store/Observable", "dojo/store/Memory",
   //"dojox/charting/themes/Claro",
   //"dojox/charting/widget/SelectableLegend",
   //"dojox/charting/widget/Legend",  
@@ -28,6 +29,7 @@ define([
   DataSourceProxy, FeatureSet,
   Chart2D, Pie, Highlight, MoveSlice, 
   Tooltip, CubanShirts, 
+  //ObservableStore, MemoryStore,
   //Claro, SelectableLegend, Legend,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Memory, Observable, Query, Grid, templateString) {
 
@@ -55,6 +57,15 @@ define([
         return this;
       };
       
+      dsnArr=[];
+
+      // var store = new ObservableStore(new MemoryStore({
+      //   data: {
+      //     items: dsnArr
+      //   }
+      // }));
+
+
       colors= ["#a08bdd", "#c7b85e", "#af95ff", "#67a966", "#99c044"];
       chart = new dojox.charting.Chart2D("reportChartDiv");
       chart.addPlot("default", {
@@ -67,16 +78,26 @@ define([
           //labelStyle: "columns"
       }).setTheme(dojox.charting.themes.CubanShirts);
 
+      chart.connectToPlot("default", function(evt) {
+        if(evt.type != 'onclick') return;
+        // Use console to output information about the event
+        console.info("Chart event on default plot!", evt);
+        console.info(evt.run.data[evt.index]["data-ids"]);
+        // console.info("Event type is: ",evt.type); // onclick
+        // console.info("The element clicked was: ",evt.element); // slice
+        });
+
       var a1 = new dojox.charting.action2d.Tooltip(chart, "default");
       var a = new dojox.charting.action2d.MoveSlice(chart, "default", {
           duration: 500,
-          //scale: 1.1,
+          scale: 1.1,
           shift: 10
       });
 
       var a2 = new dojox.charting.action2d.Highlight(chart, "default");
 
-      chart.render();
+      // chart.addSeries("Incidents", new StoreSeries(store));
+      // chart.render();
 
       // var selectableLegend = new dojox.charting.widget.SelectableLegend({
       //     chart: chart,
@@ -185,7 +206,8 @@ define([
           var countList = this.document.getElementById('countList');
           countList.innerHTML = '';
 
-          var dsnArr=[];
+          //var 
+          dsnArr=[];
           
           var c = 0;
 
@@ -220,10 +242,11 @@ define([
               dsnArr.push({
                 y: prevDates[key].count,
                 text: (prevDates[key].count/total*100).toFixed(1)+"%",
-                tooltip: countsStr +" : "+prevDates[cnt].count,
+                tooltip: countsStr +" : "+prevDates[key].count,
                 fontSize: 14,
                 fontColor: 'black',
-                color: colors[c]
+                color: colors[c],
+                "data-ids" : prevDates[key].features
               });
               c = (c+1) % colors.length;
             }
