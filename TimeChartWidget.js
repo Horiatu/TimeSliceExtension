@@ -105,6 +105,24 @@ define([
       //     horizontal: true
       // }, "reportChartLegendDiv");
 
+      totalDays = document.getElementById("totalDays");
+      period = document.getElementById("period");
+
+      totalDays.addEventListener("change", lang.hitch(this, function(v) { 
+          document.getElementById("totalDaysCount").innerHTML = totalDays.value;
+          this.getDataSourceProxies().then( this.getContsByDates );
+        })
+      );
+      period.addEventListener("change", lang.hitch(this, function(v) { 
+          document.getElementById("periodCount").innerHTML = period.value;
+          this.getDataSourceProxies().then( this.getContsByDates );
+        })
+      );
+
+      document.getElementById("expandBtn").addEventListener("click", function() {
+        var div = document.getElementById("TotalPeriod");
+        div.className = (div.className=='hide') ? '' : 'hide';
+      });
     },
 
     getContsByDates : function(dataSources) {
@@ -143,8 +161,8 @@ define([
         query.returnGeometry = false;
 
         var prevDates = {};
-        var maxDays = 50;
-        var period = 10;
+        var maxDays = parseInt(this.totalDays.value);
+        var period = parseInt(this.period.value);
 
         for(var i=1; i<=maxDays / period; i++) {
             var j=i*period;
@@ -153,7 +171,7 @@ define([
             : (((i-1) * period)+1 + " to " + (i*period) + " days");
             prevDates[k]={ date: new Date().addDays(-j), count:0, features:[]};
         }
-        prevDates["more than "+(maxDays+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
+        prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
         
         var getSumCounts = function(dfr, dataSources) {
           if(dataSources && dataSources.length > 0) {

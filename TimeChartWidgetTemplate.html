@@ -1,7 +1,22 @@
 <div>
     <!-- Display data source name and the number of features -->
     <div id="reportChartDiv" style='display:block; clear:none; z-index:999; width:100%; height:100%;'></div>
-    <ul id="countList"></ul>
+    <table id="legend" width="100%"><tr>
+	    <td width="100%">
+	    	<ul id="countList"></ul>
+	    </td>
+	    <td>
+	    	<img src="expand.png" id="expandBtn"/>
+		    <div id="TotalPeriod" class="hide">
+		    	<div style="position:absolute; overflow-x: hidden; padding: 0 3px;">
+			    	<label for="totalDays">Total days: </label><span id="totalDaysCount">50</span><br/>
+			    	<input id="totalDays" type="range" min="10" max="365" value="50" step="5"></input><br/><br/>
+			    	<label for="period">Period: </label><span id="periodCount">10</span><br/>
+			    	<input id="period" type="range" min="5" max="30" value="10" step="5"></input>
+		    	</div>
+	    	</div>
+	    </td>
+    </tr></table>
     <!-- <div id='reportChartLegendDiv'></div> -->
     <!-- <label class="dataSourceInfoLabel" data-dojo-attach-point="infoLabel"></label>
 	<br/><br/> -->

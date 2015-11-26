@@ -68,3 +68,35 @@ label{
 .title {
   font-weight: bold;
 }
+
+#countList {
+  margin: 0 0 0 -20px;
+}
+
+#legend td {
+  vertical-align: top;
+  padding-top:6px;
+}
+
+#expandBtn {
+  margin-left: -20px;
+  margin-top: -6px;
+  float: left;
+  width: 12px;
+  height: 12px;
+  opacity:0.5;
+}
+
+#expandBtn:hover {
+  opacity:1;
+}
+
+
+#TotalPeriod {
+  width:140px;
+  transition: width 0.25s ease-in-out;
+}
+
+.hide {
+  width:0 !important;
+}
