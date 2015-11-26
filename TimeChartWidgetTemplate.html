@@ -1,22 +1,47 @@
 <div>
     <!-- Display data source name and the number of features -->
     <div id="reportChartDiv" style='display:block; clear:none; z-index:999; width:100%; height:100%;'></div>
-    <table id="legend" width="100%"><tr>
-	    <td width="100%">
-	    	<ul id="countList"></ul>
-	    </td>
-	    <td>
-	    	<img src="expand.png" id="expandBtn" title="expand"/>
-		    <div id="TotalPeriod" class="hide">
-		    	<div style="position:absolute; overflow-x: hidden; padding: 0 3px;">
-			    	<label for="totalDays">Total days: </label><span id="totalDaysCount">50</span><br/>
-			    	<input id="totalDays" type="range" min="10" max="365" value="50" step="5"></input><br/>
-			    	<label for="period">Period: </label><span id="periodCount">10</span><br/>
-			    	<input id="period" type="range" min="5" max="30" value="10" step="5"></input>
-		    	</div>
+
+    <div style="float:left">
+    	<ul id="countList"></ul>
+    </div>
+
+    <div style="right:0; position:absolute;">
+	    <div id="TotalPeriod" class="hide">
+	    	<div id="TotalPeriod1">
+    			<img src="expand.png" id="expandBtn" title="expand"/>
+		    	<label for="totalDays">Enquire over: </label><span id="totalDaysCount">50</span><span> days</span><br/>
+		    	<input id="totalDays" type="range" min="10" max="120" value="50" step="10" list="steplist">
+				<datalist id="steplist">
+				    <option>0</option>
+				    <option>10</option>
+				    <option>20</option>
+				    <option>30</option>
+				    <option>40</option>
+				    <option>50</option>
+				    <option>60</option>
+				    <option>70</option>
+				    <option>80</option>
+				    <option>90</option>
+				    <option>100</option>
+				    <option>110</option>
+				    <option>120</option>
+				</datalist><br/>
+		    	<label for="period">Periods of: </label><span id="periodCount">10</span><span> days</span><br/>
+		    	<input id="period" type="range" min="5" max="30" value="10" step="5" list="steplist1">
+				<datalist id="steplist1">
+				    <option>0</option>
+				    <option>5</option>
+				    <option>10</option>
+				    <option>15</option>
+				    <option>20</option>
+				    <option>25</option>
+				    <option>30</option>
+				</datalist><br/>
 	    	</div>
-	    </td>
-    </tr></table>
+    	</div>
+    </div>
+
     <!-- <div id='reportChartLegendDiv'></div> -->
     <!-- <label class="dataSourceInfoLabel" data-dojo-attach-point="infoLabel"></label>
 	<br/><br/> -->

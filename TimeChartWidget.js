@@ -108,20 +108,35 @@ define([
       totalDays = document.getElementById("totalDays");
       period = document.getElementById("period");
 
-      totalDays.addEventListener("change", lang.hitch(this, function(v) { 
+      totalDays.addEventListener("input", lang.hitch(this, function(v) { 
           document.getElementById("totalDaysCount").innerHTML = totalDays.value;
+        })
+      );
+      totalDays.addEventListener("change", lang.hitch(this, function(v) { 
           this.getDataSourceProxies().then( this.getContsByDates );
         })
       );
-      period.addEventListener("change", lang.hitch(this, function(v) { 
+      period.addEventListener("input", lang.hitch(this, function(v) { 
           document.getElementById("periodCount").innerHTML = period.value;
+        })
+      );
+      period.addEventListener("change", lang.hitch(this, function(v) { 
           this.getDataSourceProxies().then( this.getContsByDates );
         })
       );
 
       document.getElementById("expandBtn").addEventListener("click", function() {
         var div = document.getElementById("TotalPeriod");
-        div.className = (div.className=='hide') ? '' : 'hide';
+        var expandBtn = document.getElementById("expandBtn");
+        if(div.className=='hide') {
+          div.className = '';
+          expandBtn.setAttribute('src', 'collapse.png');
+          expandBtn.setAttribute('title', 'collapse');
+        } else {
+          div.className='hide';
+          expandBtn.setAttribute('src', 'expand.png');
+          expandBtn.setAttribute('title', 'expand');
+        }
       });
     },
 

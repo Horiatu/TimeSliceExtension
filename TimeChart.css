@@ -80,7 +80,7 @@ label{
 
 #expandBtn {
   margin-left: -20px;
-  margin-top: -6px;
+  margin-top: 4px;
   float: left;
   width: 12px;
   height: 12px;
@@ -93,11 +93,21 @@ label{
 
 
 #TotalPeriod {
-  width:140px;
+  width:145px;
   -webkit-transition: width 0.25s ease-in-out;
   -moz-transition: width 0.25s ease-in-out;
   -o-transition: width 0.25s ease-in-out;
   transition: width 0.25s ease-in-out;
+}
+
+#TotalPeriod1 {
+  position:absolute; 
+  overflow-x: hidden; 
+  padding: 0 3px; 
+  background-color:white; 
+  margin-left:-24px; 
+  padding-left:24px;
+  padding-top:2px;
 }
 
 .hide {
