@@ -94,6 +94,9 @@ label{
 
 #TotalPeriod {
   width:140px;
+  -webkit-transition: width 0.25s ease-in-out;
+  -moz-transition: width 0.25s ease-in-out;
+  -o-transition: width 0.25s ease-in-out;
   transition: width 0.25s ease-in-out;
 }
 
