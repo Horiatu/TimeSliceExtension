@@ -111,7 +111,8 @@ label{
 }
 
 #TotalPeriod1 {
-  position:absolute; 
+  float:left;
+  --position:absolute; 
   overflow-x: hidden; 
   padding: 0 3px; 
   background-color:white; 

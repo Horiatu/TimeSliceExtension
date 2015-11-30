@@ -297,6 +297,10 @@ define([
           };
           chart.addSeries("Incidents", dsnArr);
           chart.render();
+          document.getElementById('LegendDiv').style["min-height"] = Math.max(
+            document.getElementById('countList').offsetHeight,
+            document.getElementById('TotalPeriod1').offsetHeight
+            )+'px';
       })
     },
 
