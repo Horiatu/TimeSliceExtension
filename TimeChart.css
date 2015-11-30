@@ -58,11 +58,13 @@ label{
 }
 
 .legend div {
-  height: 14px;
+  height: 16px;
   width: 20px;
   display: inline-block;
   vertical-align: baseline;
-  margin-right: 10px;
+  margin-right: 6px;
+  margin-bottom: -2px;
+  margin-left: 2px;
 }
 
 .title {
@@ -70,7 +72,9 @@ label{
 }
 
 #countList {
-  margin: 0 0 0 -20px;
+  margin: 0 0 0 10px;
+  padding-left: 4px;
+  padding-bottom: 4px;
 }
 
 #legend td {
@@ -81,10 +85,16 @@ label{
 #expandBtn {
   margin-left: -18px;
   margin-top: 4px;
+  padding: 1px;
   float: left;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
+  border:none;
   opacity:0.5;
+}
+
+#expandBtn:focus {
+    outline: -webkit-focus-ring-color auto 5px;
 }
 
 #expandBtn:hover {

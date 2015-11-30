@@ -125,16 +125,26 @@ define([
         })
       );
 
-      document.getElementById("expandBtn").addEventListener("click", function() {
-        var div = document.getElementById("TotalPeriod");
+      var expandBtn = document.getElementById("expandBtn");
+      var TotalPeriod = document.getElementById("TotalPeriod");
+      expandBtn.addEventListener("keydown", function(e) {
+        if(e.keyCode==9 && !e.shiftKey) {
+          e.preventDefault();
+          expandBtn.click();
+          if(TotalPeriod.className=='') {
+            document.getElementById('totalDays').focus();
+          }
+        }
+      });
+      expandBtn.addEventListener("click", function() {
         var expandBtn = document.getElementById("expandBtn");
-        if(div.className=='hide') {
-          div.className = '';
-          expandBtn.setAttribute('src', 'collapse.png');
+        if(TotalPeriod.className=='hide') {
+          TotalPeriod.className = '';
+          expandBtn.children[0].setAttribute('src', 'collapse.png');
           expandBtn.setAttribute('title', 'collapse');
         } else {
-          div.className='hide';
-          expandBtn.setAttribute('src', 'expand.png');
+          TotalPeriod.className='hide';
+          expandBtn.children[0].setAttribute('src', 'expand.png');
           expandBtn.setAttribute('title', 'expand');
         }
       });
@@ -234,7 +244,7 @@ define([
 
       exec(new Deferred).then(function(prevDates) {
 
-          console.log(prevDates);
+          // console.log(prevDates);
 
           var countList = this.document.getElementById('countList');
           countList.innerHTML = '';
@@ -260,6 +270,7 @@ define([
             if(prevDates[key].count>0){
               var li = this.document.createElement('li');
               li.className = 'legend';
+              li.setAttribute('tabindex', 0);
               var m = document.createElement('div');
               m.style['background-color']=colors[c];
 
