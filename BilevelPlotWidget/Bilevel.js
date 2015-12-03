@@ -25,7 +25,7 @@ arc : d3.svg.arc()
 key : function(d) {
   var k = []; p = d;
   while (p.depth) k.push(p.name), p = p.parent;
-  return k.reverse().join(".");
+  return k.reverse().join(" > ");
 },
 
 fill : function (d) {
@@ -52,27 +52,11 @@ updateArc : function (d) {
 
 var _public = {
 
-init : function(dataFile, width) {
-  var m = width/2-20;
-  _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
-  _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
-  
-  var div = d3.select("#BilevelPlotDiv");
+  Clear : function() {
+    _private.svg.Clear(); // ?
+  },
 
-  _private.svg = //d3.select("body")
-  div.append("svg")
-    .attr("width", _private.margin.left + _private.margin.right + 20)
-    .attr("height", _private.margin.top + _private.margin.bottom + 20)
-  .append("g")
-    .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
-
-  _private.partition.size([2 * Math.PI, _private.radius]);
-
-  _private.arc.padRadius(_private.radius / 3)
-    .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
-    .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
-
-  d3.json(dataFile, function(error, root) {
+  Plot : function(root) {
 
     // Compute the initial layout on the entire tree to sum sizes.
     // Also compute the full name and fill color for each node,
@@ -96,8 +80,7 @@ init : function(dataFile, width) {
         .attr("r", _private.radius / 3)
         .on("click", zoomOut);
 
-    center.append("title")
-        .text("zoom out");
+    center.append("title").text("zoom out");
 
     var path = _private.svg.selectAll("path")
         .data(_private.partition.nodes(root).slice(1))
@@ -109,18 +92,22 @@ init : function(dataFile, width) {
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
+      d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.value;
       if (!p.children) return;
       zoom(p, p);
     }
 
     function zoomOut(p) {
-      if (!p.parent) return;
+      if (!p || !p.parent) return;
+      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):"")+p.parent.value;
       zoom(p.parent, p);
     }
 
     // Zoom to the specified new root.
     function zoom(root, p) {
       if (document.documentElement.__transition__) return;
+
+      //console.log(root, p);
 
       // Rescale outside angles to match the new layout.
       var enterArc,
@@ -167,7 +154,32 @@ init : function(dataFile, width) {
             .attrTween("d", function(d) { return _private.arcTween.call(this, _private.updateArc(d)); });
       });
     }
+  },
+
+Init : function(dataFile, width) {
+  var m = width/2-20;
+  _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+  _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
+  
+  var div = d3.select("#BilevelPlotDiv");
+
+  _private.svg = //d3.select("body")
+  div.append("svg")
+    .attr("width", _private.margin.left + _private.margin.right + 20)
+    .attr("height", _private.margin.top + _private.margin.bottom + 20)
+  .append("g")
+    .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
+
+  _private.partition.size([2 * Math.PI, _private.radius]);
+
+  _private.arc.padRadius(_private.radius / 3)
+    .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
+    .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
+
+  d3.json(dataFile, function(error, root) {
+    Bilevel.Plot(root);
   });
+
 }};
     return _public;
 

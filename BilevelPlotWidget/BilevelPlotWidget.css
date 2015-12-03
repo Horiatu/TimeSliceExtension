@@ -124,3 +124,12 @@ label{
 .hide {
   width:0 !important;
 }
+
+#key {
+  width:100%;
+  min-height:48px;
+}
+
+#key h1 {
+  font-size: 14px;
+}
