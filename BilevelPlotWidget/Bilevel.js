@@ -5,8 +5,8 @@ var _private = {
 
 margin : {top: 220, right: 200, bottom: 200, left: 200},
 radius : 0, //Math.min(margin.top, margin.right, margin.bottom, margin.left),
-hue : d3.scale.category10(),
 
+hue : d3.scale.category10(),
 luminance : d3.scale.sqrt()
     .domain([0, 1e6])
     .clamp(true)
@@ -32,7 +32,7 @@ fill : function (d) {
   var p = d;
   while (p.depth > 1) p = p.parent;
   var c = d3.lab(_private.hue(p.name));
-  c.l = _private.luminance(d.sum);
+  c.l = _private.luminance((10-d.depth)*d.sum*30000);
   return c;
 },
 
@@ -53,16 +53,22 @@ updateArc : function (d) {
 var _public = {
 
   Clear : function() {
-    _private.svg.Clear(); // ?
+    // _private.partition = d3.layout.partition()
+    //   .sort(function(a, b) { return d3.ascending(a.name, b.name); });
   },
 
   Plot : function(root) {
 
+    console.log(root, _private.partition.nodes(root))
+
     // Compute the initial layout on the entire tree to sum sizes.
     // Also compute the full name and fill color for each node,
     // and stash the children so they can be restored as we descend.
+
     _private.partition
-        .value(function(d) { return d.size; })
+        .value(function(d) { 
+          return d.size; 
+        })
         .nodes(root)
         .forEach(function(d) {
           d._children = d.children;
@@ -76,37 +82,36 @@ var _public = {
         .children(function(d, depth) { return depth < 2 ? d._children : null; })
         .value(function(d) { return d.sum; });
 
-    var logo=_private.svg.append("defs").append("pattern")
-      .attr('id', "logo")
-      .attr('patternUnits', 'userSpaceOnUse')
-       .attr('width', 200)
-       .attr('height', 200)
-       .attr('x', -32)
-       .attr('y', -32)
-       .append("image")
-       .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
-       .attr('width', 64)
-       .attr('height', 64);
+    var center = d3.select('#center');
+    if(!center || !center[0][0]) {
+      var logo=_private.svg.append("defs").append("pattern")
+        .attr('id', "logo")
+        .attr('patternUnits', 'userSpaceOnUse')
+         .attr('width', 200)
+         .attr('height', 200)
+         .attr('x', -32)
+         .attr('y', -32)
+         .append("image")
+         .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
+         .attr('width', 64)
+         .attr('height', 64);
 
-    var center = _private.svg.append("circle")
-        .attr("r", _private.radius / 3)
-        .on("click", zoomOut);
+      center = _private.svg.append("circle")
+          .attr('id','center')
+          .attr("r", _private.radius / 3)
+          .on("click", zoomOut);
 
-    center
-    .append('g').append('image')
-      .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
-       .attr('width', 64)
-       .attr('height', 64);
+      center
+      .append('g').append('image')
+        .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
+         .attr('width', 64)
+         .attr('height', 64);
 
-  // <defs>
-  //   <pattern id="logo" patternUnits="userSpaceOnUse" width="100" height="100">
-  //     <img src="CanadaMapComunityLogo-64x64.png" />
-  //   </pattern>
-  // </defs>
-
-
-
-    center.append("title").text("zoom out");
+      center.append("title").text("zoom out");
+    }
+    else {
+      center = center[0][0];
+    }
 
     var path = _private.svg.selectAll("path")
         .data(_private.partition.nodes(root).slice(1))

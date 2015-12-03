@@ -52,7 +52,7 @@ define([
     postCreate: function () {
       this.inherited(arguments);
 
-      Bilevel.Init("flare.json", d3.select("body")[0][0].clientWidth);
+      Bilevel.Init("ageing.json", d3.select("body")[0][0].clientWidth);
     },
 
     hostReady: function(){
@@ -102,14 +102,6 @@ define([
           expandBtn.setAttribute('title', 'expand');
         }
       });
-
-      // // Query the features and update the chart
-      // var dataSourceProxy = this.dataSourceProxies[0];
-      // var dataSourceConfig = this.getDataSourceConfig(dataSourceProxy);
-      // this.query = new Query();
-      // this.query.outFields = [dataSourceProxy.objectIdFieldName, dataSourceConfig.idField, dataSourceConfig.xField, dataSourceConfig.yField];
-      // this.query.returnGeometry = false;
-
     },
 
     ageingRoot : {},
@@ -163,6 +155,24 @@ define([
         prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
         
         var getSumCounts = function(dfr, dataSources) {
+
+          Array.prototype.addValue = function(k, v) {
+            var dfr = new Deferred();
+
+            var valObj = this.find(function (f) { return(f.name==k);});
+
+            if(valObj == undefined) {
+              valObj = (v == undefined) ? {name:k, children:[]} : {name:k, size:v};
+              this.push(valObj);
+            } else {
+              if(v != undefined) {
+                valObj["size"] += v;
+              }
+            }
+            dfr.resolve(valObj);
+            return dfr;
+          };
+
           if(dataSources && dataSources.length > 0) {
             ageingRoot = {"name": "ageing", "children": []};
             executeQuery(dataSources.pop(), query).then(
@@ -178,9 +188,17 @@ define([
                                 prevDates[k].features.push(f.attributes.objectid);
                                 prevDates[k].count++;
 
-                                var periods = ageingRoot["children"];
+                                ageingRoot.children.addValue(k).then(function (r){
+                                  r.children.addValue(f.attributes.Creator).then(function (r){
+                                    r.children.addValue('Type '+f.attributes['feedback_obstype']).then(function (r){
+                                      r.children.addValue("Status "+f.attributes['feedback_status'], 1).then(function (r){
+                                        //console.log(ageingRoot, r);
+                                        throw BreakException;
+                                      })
+                                    })
+                                  });
+                                });
 
-                                throw BreakException;
                             }
                         }
                     } catch(e) {
@@ -205,14 +223,19 @@ define([
         };
 
         getSumCounts(new Deferred, dataSources).then(function() {
-          dfr.resolve(prevDates);
+          dfr.resolve({prevDates:prevDates, ageingRoot:ageingRoot});
         });
         return dfr;
       };
 
-      exec(new Deferred).then(function(prevDates) {
+      exec(new Deferred).then(function(results) {
 
-          // console.log(prevDates);
+          //console.log(results);
+
+          // Bilevel.Clear();
+          console.log(JSON.stringify(results.ageingRoot));
+          return;
+          // Bilevel.Plot(results.ageingRoot);
 
           var countList = this.document.getElementById('countList');
           countList.innerHTML = '';
@@ -223,8 +246,8 @@ define([
           var c = 0;
 
           var total = 0;
-          for(var cnt in prevDates) {
-            total += prevDates[cnt].count;
+          for(var cnt in results.prevDates) {
+            total += results.prevDates[cnt].count;
           }
 
           var liTotal = this.document.createElement('li');
@@ -232,10 +255,10 @@ define([
           liTotal.appendChild(document.createTextNode('Selected Incidents: '+total));
           countList.appendChild(liTotal);
 
-          for(var key in prevDates) {
+          for(var key in results.prevDates) {
             var countsStr = key;
             
-            if(prevDates[key].count>0){
+            if(results.prevDates[key].count>0){
               var li = this.document.createElement('li');
               li.className = 'legend';
               li.setAttribute('tabindex', 0);
@@ -247,24 +270,24 @@ define([
 
               var countNode = document.createElement('div');
               countNode.className = 'title';
-              countNode.appendChild(document.createTextNode(prevDates[key].count));
+              countNode.appendChild(document.createTextNode(results.prevDates[key].count));
               li.appendChild(countNode);
               countList.appendChild(li);
 
               dsnArr.push({
-                y: prevDates[key].count,
-                text: (prevDates[key].count/total*100).toFixed(1)+"%",
-                tooltip: countsStr +" : "+prevDates[key].count,
+                y: results.prevDates[key].count,
+                text: (results.prevDates[key].count/total*100).toFixed(1)+"%",
+                tooltip: countsStr +" : "+results.prevDates[key].count,
                 fontSize: 14,
                 fontColor: 'black',
                 color: 'black',// colors[c],
-                "data-ids" : prevDates[key].features
+                "data-ids" : results.prevDates[key].features
               });
               //c = (c+1) % colors.length;
             }
           };
-          chart.addSeries("Incidents", dsnArr);
-          chart.render();
+          // chart.addSeries("Incidents", dsnArr);
+          // chart.render();
           document.getElementById('LegendDiv').style["min-height"] = Math.max(
             document.getElementById('countList').offsetHeight,
             document.getElementById('TotalPeriod1').offsetHeight
