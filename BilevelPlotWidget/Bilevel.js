@@ -76,9 +76,35 @@ var _public = {
         .children(function(d, depth) { return depth < 2 ? d._children : null; })
         .value(function(d) { return d.sum; });
 
+    var logo=_private.svg.append("defs").append("pattern")
+      .attr('id', "logo")
+      .attr('patternUnits', 'userSpaceOnUse')
+       .attr('width', 200)
+       .attr('height', 200)
+       .attr('x', -32)
+       .attr('y', -32)
+       .append("image")
+       .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
+       .attr('width', 64)
+       .attr('height', 64);
+
     var center = _private.svg.append("circle")
         .attr("r", _private.radius / 3)
         .on("click", zoomOut);
+
+    center
+    .append('g').append('image')
+      .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
+       .attr('width', 64)
+       .attr('height', 64);
+
+  // <defs>
+  //   <pattern id="logo" patternUnits="userSpaceOnUse" width="100" height="100">
+  //     <img src="CanadaMapComunityLogo-64x64.png" />
+  //   </pattern>
+  // </defs>
+
+
 
     center.append("title").text("zoom out");
 

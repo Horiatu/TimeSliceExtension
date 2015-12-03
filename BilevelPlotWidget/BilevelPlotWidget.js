@@ -112,6 +112,8 @@ define([
 
     },
 
+    ageingRoot : {},
+
     getContsByDates : function(dataSources) {
       document.dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
       //console.log(dataSources);
@@ -162,6 +164,7 @@ define([
         
         var getSumCounts = function(dfr, dataSources) {
           if(dataSources && dataSources.length > 0) {
+            ageingRoot = {"name": "ageing", "children": []};
             executeQuery(dataSources.pop(), query).then(
               lang.hitch(this, function (featureSet) {
                 //console.log(featureSet.features);
@@ -174,6 +177,9 @@ define([
                             if(prevDates[k].last || CreationDate > prevDates[k].date) {
                                 prevDates[k].features.push(f.attributes.objectid);
                                 prevDates[k].count++;
+
+                                var periods = ageingRoot["children"];
+
                                 throw BreakException;
                             }
                         }
