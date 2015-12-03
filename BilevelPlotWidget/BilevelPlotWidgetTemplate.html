@@ -1,0 +1,61 @@
+<div>
+    <!-- Display data source name and the number of features -->
+    <div>
+    <center>
+    <div id="BilevelPlotDiv" style='display:block; clear:none; z-index:999; width:auto; height:auto;'></div>
+    </center>
+
+	<div id="LegendDiv">
+	    <!-- <div style="float:left; margin-right: -300px;">
+	    	<ul id="countList" tabindex="0" title="Legend"></ul>
+	    </div> -->
+
+	    <div style="float:right;"> <!-- right:0; position:absolute; -->
+		    <div id="TotalPeriod" class="hide">
+		    	<div id="TotalPeriod1">
+	    			<button id="expandBtn" title="expand">
+	    				<img src="expand.png"/>
+	    			</button>
+	    			<div>
+				    	<label for="totalDays">Maximum: </label><span id="totalDaysCount">50</span><span> days</span><br/>
+				    	<input id="totalDays" type="range" min="10" max="120" value="50" step="10" list="steplist" role="button" aria-describedby="">
+						<datalist id="steplist">
+						    <option>0</option>
+						    <option>10</option>
+						    <option>20</option>
+						    <option>30</option>
+						    <option>40</option>
+						    <option>50</option>
+						    <option>60</option>
+						    <option>70</option>
+						    <option>80</option>
+						    <option>90</option>
+						    <option>100</option>
+						    <option>110</option>
+						    <option>120</option>
+						</datalist><br/>
+				    	<label for="period">Breaks: </label><span id="periodCount">10</span><span> days</span><br/>
+				    	<input id="period" type="range" min="5" max="30" value="10" step="5" list="steplist1" role="button">
+						<datalist id="steplist1">
+						    <option>0</option>
+						    <option>5</option>
+						    <option>10</option>
+						    <option>15</option>
+						    <option>20</option>
+						    <option>25</option>
+						    <option>30</option>
+						</datalist>
+					</div>
+		    	</div>
+	    	</div>
+	    </div>
+	</div>
+	</div>
+    <!-- <div id='reportChartLegendDiv'></div> -->
+    <!-- <label class="dataSourceInfoLabel" data-dojo-attach-point="infoLabel"></label>
+	<br/><br/> -->
+  	<!-- Show the features on an attribute table-->
+  	<!-- Add the dgrid-autoheight class to the table
+  	so that its height will auto-adjust based on the contents -->
+  	<!-- <table class="dgrid-autoheight" data-dojo-attach-point="gridDiv"></table> -->
+</div>

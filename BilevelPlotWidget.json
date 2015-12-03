@@ -1,0 +1,17 @@
+{
+  "type": "Widget",
+  "title": "Bilevel Plot Widget",
+  "description": "Bilevel Plot for the Ageing Time Chart",
+  "thumbnailPath": "BilevelPlotWidget/icon.png",
+  "useDataFromView": true,
+  "runtime": {
+    "path": "BilevelPlotWidget/BilevelPlotWidget.html"
+  },
+  "configuration": {
+    "path": "BilevelPlotWidget/BilevelPlotWidgetConfig.html",
+    "requireDataSource": true,
+    "supportFeatureActions": true,
+    "showDescriptionInput": false
+  },
+  "credits": "By Esri (http://www.esri.com)"
+}

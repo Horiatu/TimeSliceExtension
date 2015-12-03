@@ -1,0 +1,126 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font: 13px sans-serif;
+  font-family: "Segoe UI";
+}
+
+label{
+  font-weight: bold;
+}
+
+.table {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+
+.table-row {
+  display: table-row;
+}
+
+.table-row.full {
+  height: 100%;
+}
+
+@import "//js.arcgis.com/3.14/dojox/form/resources/CheckedMultiSelect.css";
+
+.dataSourceInfoLabel {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.configLabel {
+  margin-bottom: 10px;
+}
+
+.dojoxCheckedMultiSelect, .dojoxCheckedMultiSelectWrapper {
+  height: inherit !important;
+  margin: 0 !important;
+  overflow-y: auto !important;
+  border: none !important;
+}
+
+.dijitInline.dojoxMultiSelectItemLabel, .dijitInline.dijitCheckBox {
+  display: inline;
+}
+
+.legend {
+  list-style-type: none;
+  font-size: 14px;
+  margin-right: 20px;
+}
+
+.legend div {
+  height: 16px;
+  width: 20px;
+  display: inline-block;
+  vertical-align: baseline;
+  margin-right: 6px;
+  margin-bottom: -2px;
+  margin-left: 2px;
+}
+
+.title {
+  font-weight: bold;
+}
+
+#countList {
+  margin: 0 0 0 10px;
+  padding-left: 4px;
+  padding-bottom: 4px;
+}
+
+#legend td {
+  vertical-align: top;
+  padding-top:6px;
+}
+
+#expandBtn {
+  margin-left: -18px;
+  margin-top: 4px;
+  padding: 1px;
+  float: left;
+  width: 14px;
+  height: 14px;
+  border:none;
+  opacity:0.5;
+}
+
+#expandBtn:focus {
+    outline: -webkit-focus-ring-color auto 5px;
+}
+
+#expandBtn:hover {
+  opacity:1;
+}
+
+
+#TotalPeriod {
+  width:145px;
+  -webkit-transition: width 0.25s ease-in-out;
+  -moz-transition: width 0.25s ease-in-out;
+  -o-transition: width 0.25s ease-in-out;
+  transition: width 0.25s ease-in-out;
+}
+
+#TotalPeriod1 {
+  float:left;
+  --position:absolute; 
+  overflow-x: hidden; 
+  padding: 0 3px; 
+  background-color:white; 
+  margin-left:-24px; 
+  padding-left:24px;
+  padding-top:2px;
+}
+
+.hide {
+  width:0 !important;
+}

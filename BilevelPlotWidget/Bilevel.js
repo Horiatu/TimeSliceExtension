@@ -52,10 +52,12 @@ updateArc : function (d) {
 
 var _public = {
 
-init : function(dataFile) {
-  _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.left);
+init : function(dataFile, width) {
+  var m = width/2-20;
+  _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+  _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
   
-  var div = d3.select("body").append("center");
+  var div = d3.select("#BilevelPlotDiv");
 
   _private.svg = //d3.select("body")
   div.append("svg")
@@ -172,4 +174,4 @@ init : function(dataFile) {
 }();
 
 
-Bilevel.init("flare.json");
+//Bilevel.init("flare.json");

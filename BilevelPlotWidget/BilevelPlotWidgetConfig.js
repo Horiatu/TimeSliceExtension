@@ -23,11 +23,11 @@ define([
   "dijit/_TemplatedMixin",
   "dijit/_WidgetsInTemplateMixin",
   "esri/opsdashboard/WidgetConfigurationProxy",
-  "dojo/text!./ScatterPlotWidgetConfigTemplate.html",
+  "dojo/text!./BilevelPlotWidgetConfigTemplate.html",
   "dijit/form/Select"
 ], function (declare, lang, Memory, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy, templateString) {
 
-  return declare("ScatterPlotWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy], {
+  return declare("BilevelPlotWidgetConfig", [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, WidgetConfigurationProxy], {
 
     templateString: templateString,
 
