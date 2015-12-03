@@ -78,13 +78,19 @@ define([
           //labelStyle: "columns"
       }).setTheme(dojox.charting.themes.CubanShirts);
 
-      chart.connectToPlot("default", function(evt) {
+      chart.connectToPlot("default", this, function(evt) {
+        //// console.info("Chart event on default plot!", evt);
         if(evt.type != 'onclick') return;
-        // Use console to output information about the event
-        console.info("Chart event on default plot!", evt);
-        console.info(evt.run.data[evt.index]["data-ids"]);
-        // console.info("Event type is: ",evt.type); // onclick
-        // console.info("The element clicked was: ",evt.element); // slice
+        var featureIds = evt.run.data[evt.index]["data-ids"];
+        //// console.info(featureIds);
+        // document.dataSources.forEach(function(ds) {
+        //   ds.supportSelections = true;
+        //   if(ds.supportSelections) {
+        //     ds.selectFeaturesByObjectIds(featureIds);
+        //   } else {
+        //     console.log("DataSource does not support selections:", ds, featureIds);
+        //   }
+        // })
         });
 
       var a1 = new dojox.charting.action2d.Tooltip(chart, "default");
@@ -151,7 +157,7 @@ define([
     },
 
     getContsByDates : function(dataSources) {
-      dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
+      document.dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
       //console.log(dataSources);
       
       //this.document.getElementById('countList').innerHTML = '';

@@ -2,10 +2,10 @@
 	"type": "Widget",
 	"title": "Time Chart Widget",
 	"description": "A widget that shows a time chart from a data source",
-	"thumbnailPath": "TimeChart.png",
+	"thumbnailPath": "TimeChart/TimeChart.png",
 	"useDataFromView": true,
 	"runtime": {
-	"path": "TimeChart.html"
+	"path": "TimeChart/TimeChart.html"
 	},
 	"configuration": {
 		"requireDataSource": true

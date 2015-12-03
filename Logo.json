@@ -2,11 +2,11 @@
 "type": "Widget",
 "title": "Canada Map Comunity Logo Widget",
 "description": "A widget that shows the Canada Map Comunity Logo",
-"thumbnailPath": "CanadaMapComunityLogo.thumbnail.png",
-"iconPath": "CanadaMapComunityLogo.small.png",
+"thumbnailPath": "Logo/CanadaMapComunityLogo.thumbnail.png",
+"iconPath": "Logo/CanadaMapComunityLogo.small.png",
 "useDataFromView": false,
 "runtime": {
-"path": "Logo.html"
+"path": "Logo/Logo.html"
 },
 "configuration": {
 "requireDataSource": false
