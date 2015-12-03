@@ -3,7 +3,7 @@ var Bilevel = function() {
 // http://bl.ocks.org/mbostock/5944371
 var _private = {
 
-margin : {top: 180, right: 180, bottom: 180, left: 180},
+margin : {top: 220, right: 200, bottom: 200, left: 200},
 radius : 0, //Math.min(margin.top, margin.right, margin.bottom, margin.left),
 hue : d3.scale.category10(),
 
@@ -55,7 +55,10 @@ var _public = {
 init : function(dataFile) {
   _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.left);
   
-  _private.svg = d3.select("body").append("svg")
+  var div = d3.select("body").append("center");
+
+  _private.svg = //d3.select("body")
+  div.append("svg")
     .attr("width", _private.margin.left + _private.margin.right + 20)
     .attr("height", _private.margin.top + _private.margin.bottom + 20)
   .append("g")
