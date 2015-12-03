@@ -296,8 +296,9 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
-
-
+      console.log(dataSourceProxy.fields);
+      //debugger;
+      dataSourceProxy.fields.forEach(function(f) { if(f.name == 'feedback_obstype' || f.name == 'feedback_status') console.log(f);});
     },
 
   });

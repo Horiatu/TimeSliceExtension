@@ -192,6 +192,12 @@
                 "children": [{
                     "name": "Status 2",
                     "size": 1
+                }, {
+                    "name": "Status 1",
+                    "size": 2
+                }, {
+                    "name": "Status 0",
+                    "size": 5
                 }]
             }]
         }]
@@ -203,7 +209,10 @@
                 "name": "Type 0",
                 "children": [{
                     "name": "Status 2",
-                    "size": 1
+                    "size": 2
+                },{
+                    "name": "Status 1",
+                    "size": 4
                 }]
             }]
         }, {

@@ -32,7 +32,7 @@ fill : function (d) {
   var p = d;
   while (p.depth > 1) p = p.parent;
   var c = d3.lab(_private.hue(p.name));
-  c.l = _private.luminance((10-d.depth)*d.sum*30000);
+  c.l = _private.luminance((10-d.depth)*d.sum*10000);
   return c;
 },
 
