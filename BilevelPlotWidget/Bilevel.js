@@ -123,17 +123,21 @@ var _public = {
 
     //debugger
 
+    path.append("title").text(function(d) { return d.name+': '+d.sum;});
+
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
       d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.sum;
       if (!p.children) return;
       zoom(p, p);
+      path.append("title").text(function(d) { return d.name+': '+d.sum;});
     }
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
       d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+p.parent.sum;
       zoom(p.parent, p);
+      path.append("title").text(function(d) { return d.name+': '+d.sum;});
     }
 
     // Zoom to the specified new root.
