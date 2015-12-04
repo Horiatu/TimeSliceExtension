@@ -3,267 +3,363 @@
     "children": [{
         "name": "more than 51 days",
         "children": [{
-            "name": "amiller@esricanada.com (Toronto)",
+            "name": "Toronto",
             "children": [{
-                "name": "Type 0",
+                "name": "amiller@esricanada.com",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }, {
-                "name": "Type 1",
+                "name": "gkouroupistsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 1",
+                        "size": 10
+                    }, {
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "gkouroupistsg (Toronto)",
+            "name": "Ontario",
             "children": [{
-                "name": "Type 0",
+                "name": "dedwards_cmx",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }]
-        }, {
-            "name": "dedwards_cmx (Ontario)",
-            "children": [{
-                "name": "Type 1",
-                "children": [{
-                    "name": "Status 0",
-                    "size": 1
-                }]
-            }]
-        }, {
-            "name": "Waterloo_CoopTSG3 (York Region)",
-            "children": [{
-                "name": "Type 2",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 1
+                    }, {
+                        "name": "Status 1",
+                        "size": 2
+                    }, {
+                        "name": "Status 2",
+                        "size": 4
+                    }]
                 }]
             }, {
-                "name": "Type 0",
+                "name": "dedwards_cmx1",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 3
+                    }, {
+                        "name": "Status 1",
+                        "size": 1
+                    }, {
+                        "name": "Status 2",
+                        "size": 6
+                    }]
                 }]
             }]
         }, {
-            "name": "bkester_esrica_tsg (University of Alberta)",
+            "name": "York Region",
             "children": [{
-                "name": "Type 2",
+                "name": "Waterloo_CoopTSG3",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (NRCan (CanVec))",
+            "name": "University of Alberta",
             "children": [{
-                "name": "Type 1",
+                "name": "bkester_esrica_tsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (Region of Peel)",
+            "name": "NRCan (CanVec)",
             "children": [{
-                "name": "Type 0",
+                "name": "Waterloo_CoopTSG1",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }]
+            }]
+        }, {
+            "name": "Region of Peel",
+            "children": [{
+                "name": "Waterloo_CoopTSG1",
+                "children": [{
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }]
     }, {
         "name": "21 to 30 days",
         "children": [{
-            "name": "gkouroupistsg (Toronto)",
+            "name": "Toronto",
             "children": [{
-                "name": "Type 0",
+                "name": "gkouroupistsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "dedwards_cmx (Ontario)",
+            "name": "Ontario",
             "children": [{
-                "name": "Type 1",
+                "name": "dedwards_cmx",
                 "children": [{
-                    "name": "Status 0",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG3 (York Region)",
+            "name": "York Region",
             "children": [{
-                "name": "Type 2",
+                "name": "Waterloo_CoopTSG3",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }, {
-                "name": "Type 0",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }]
-        }, {
-            "name": "bkester_esrica_tsg (University of Alberta)",
-            "children": [{
-                "name": "Type 2",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (NRCan (CanVec))",
+            "name": "University of Alberta",
             "children": [{
-                "name": "Type 1",
+                "name": "bkester_esrica_tsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (Region of Peel)",
+            "name": "NRCan (CanVec)",
             "children": [{
-                "name": "Type 0",
+                "name": "Waterloo_CoopTSG1",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }]
+            }]
+        }, {
+            "name": "Region of Peel",
+            "children": [{
+                "name": "Waterloo_CoopTSG1",
+                "children": [{
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }]
     }, {
         "name": "31 to 40 days",
         "children": [{
-            "name": "gkouroupistsg (Toronto)",
+            "name": "Toronto",
             "children": [{
-                "name": "Type 0",
+                "name": "gkouroupistsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "dedwards_cmx (Ontario)",
+            "name": "Ontario",
             "children": [{
-                "name": "Type 1",
+                "name": "dedwards_cmx",
                 "children": [{
-                    "name": "Status 0",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG3 (York Region)",
+            "name": "York Region",
             "children": [{
-                "name": "Type 2",
+                "name": "Waterloo_CoopTSG3",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }, {
-                "name": "Type 0",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }]
-        }, {
-            "name": "bkester_esrica_tsg (University of Alberta)",
-            "children": [{
-                "name": "Type 2",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (NRCan (CanVec))",
+            "name": "University of Alberta",
             "children": [{
-                "name": "Type 1",
+                "name": "bkester_esrica_tsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (Region of Peel)",
+            "name": "NRCan (CanVec)",
             "children": [{
-                "name": "Type 0",
+                "name": "Waterloo_CoopTSG1",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }]
+            }]
+        }, {
+            "name": "Region of Peel",
+            "children": [{
+                "name": "Waterloo_CoopTSG1",
+                "children": [{
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }]
     }, {
         "name": "41 to 50 days",
         "children": [{
-            "name": "gkouroupistsg (Toronto)",
+            "name": "Toronto",
             "children": [{
-                "name": "Type 0",
+                "name": "gkouroupistsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "dedwards_cmx (Ontario)",
+            "name": "Ontario",
             "children": [{
-                "name": "Type 1",
+                "name": "dedwards_cmx",
                 "children": [{
-                    "name": "Status 0",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG3 (York Region)",
+            "name": "York Region",
             "children": [{
-                "name": "Type 2",
+                "name": "Waterloo_CoopTSG3",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }, {
-                "name": "Type 0",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
-                }]
-            }]
-        }, {
-            "name": "bkester_esrica_tsg (University of Alberta)",
-            "children": [{
-                "name": "Type 2",
-                "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (NRCan (CanVec))",
+            "name": "University of Alberta",
             "children": [{
-                "name": "Type 1",
+                "name": "bkester_esrica_tsg",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }, {
-            "name": "Waterloo_CoopTSG1 (Region of Peel)",
+            "name": "NRCan (CanVec)",
             "children": [{
-                "name": "Type 0",
+                "name": "Waterloo_CoopTSG1",
                 "children": [{
-                    "name": "Status 2",
-                    "size": 1
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
+                }]
+            }]
+        }, {
+            "name": "Region of Peel",
+            "children": [{
+                "name": "Waterloo_CoopTSG1",
+                "children": [{
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 2",
+                        "size": 1
+                    }]
                 }]
             }]
         }]

@@ -121,7 +121,7 @@ var _public = {
         .each(function(d) { this._current = _private.updateArc(d); })
         .on("click", zoomIn);
 
-    debugger
+    //debugger
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
