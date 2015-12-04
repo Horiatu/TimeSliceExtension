@@ -129,8 +129,17 @@
                 "children": [{
                     "name": "Type 0",
                     "children": [{
+                        "name": "Status 0",
+                        "size": 3
+                    }, {
+                        "name": "Status 1",
+                        "size": 4
+                    }, {
                         "name": "Status 2",
-                        "size": 1
+                        "size": 2
+                    }, {
+                        "name": "Status 3",
+                        "size": 5
                     }]
                 }]
             }]
@@ -142,6 +151,27 @@
                     "name": "Type 1",
                     "children": [{
                         "name": "Status 0",
+                        "size": 1
+                    }]
+                }, {
+                    "name": "Type 2",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 1
+                    }, {
+                        "name": "Status 1",
+                        "size": 2
+                    }]
+                }, {
+                    "name": "Type 3",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 4
+                    }, {
+                        "name": "Status 1",
+                        "size": 2
+                    }, {
+                        "name": "Status 2",
                         "size": 1
                     }]
                 }]
@@ -210,8 +240,11 @@
                 "children": [{
                     "name": "Type 0",
                     "children": [{
+                        "name": "Status 1",
+                        "size": 8
+                    }, {
                         "name": "Status 2",
-                        "size": 1
+                        "size": 3
                     }]
                 }]
             }]
@@ -224,6 +257,24 @@
                     "children": [{
                         "name": "Status 0",
                         "size": 1
+                    }]
+                }]
+            }, {
+                "name": "dedwards_cmx1",
+                "children": [{
+                    "name": "Type 0",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 3
+                    }, {
+                        "name": "Status 2",
+                        "size": 4
+                    }]
+                }, {
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 1",
+                        "size": 6
                     }]
                 }]
             }]
@@ -292,7 +343,16 @@
                     "name": "Type 0",
                     "children": [{
                         "name": "Status 2",
-                        "size": 1
+                        "size": 4
+                    }, {
+                        "name": "Status 3",
+                        "size": 3
+                    }]
+                }, {
+                    "name": "Type 1",
+                    "children": [{
+                        "name": "Status 0",
+                        "size": 8
                     }]
                 }]
             }]
