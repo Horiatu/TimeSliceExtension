@@ -32,7 +32,7 @@ fill : function (d) {
   var p = d;
   while (p.depth > 1) p = p.parent;
   var c = d3.lab(_private.hue(p.name));
-  c.l = _private.luminance((10-d.depth)*d.sum*10000);
+  c.l = _private.luminance(/*(10-d.depth) * */d.sum*30000);
   return c;
 },
 
@@ -87,14 +87,14 @@ var _public = {
       var logo=_private.svg.append("defs").append("pattern")
         .attr('id', "logo")
         .attr('patternUnits', 'userSpaceOnUse')
-         .attr('width', 200)
-         .attr('height', 200)
-         .attr('x', -32)
-         .attr('y', -32)
+         .attr('width', 400)
+         .attr('height', 400)
+         .attr('x', -_private.radius*1.6/6)
+         .attr('y', -_private.radius*1.6/6)
          .append("image")
-         .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
-         .attr('width', 64)
-         .attr('height', 64);
+         .attr("xlink:href", "CanadaMapComunityLogo.thumbnail.png")
+         .attr('width', _private.radius*1.6/3)
+         .attr('height', _private.radius*1.6/3);
 
       center = _private.svg.append("circle")
           .attr('id','center')
@@ -125,14 +125,14 @@ var _public = {
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
-      d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.value;
+      d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.sum;
       if (!p.children) return;
       zoom(p, p);
     }
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
-      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):"")+p.parent.value;
+      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+p.parent.sum;
       zoom(p.parent, p);
     }
 
@@ -148,6 +148,7 @@ var _public = {
           outsideAngle = d3.scale.linear().domain([0, 2 * Math.PI]);
 
       function insideArc(d) {
+        //debugger
         return p.key > d.key
             ? {depth: d.depth - 1, x: 0, dx: 0} : p.key < d.key
             ? {depth: d.depth - 1, x: 2 * Math.PI, dx: 0}
