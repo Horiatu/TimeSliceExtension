@@ -28,24 +28,29 @@ define([
     templateString: templateString,
     debugName: "TimeChartWidget",
 
-    getDataSourceProxies: function() {
-        return !this._isHostInitialized() 
-        ? (new Deferred).reject(Error(ErrorMessages.hostNotReady)) 
-        : Msg._sendMessageWithReply({functionName: "getDataSources"}).then(lang.hitch(this, function(a) {
-            //return (new Deferred).resolve(a.dataSources);
-            this._dataSourceProxies = {};
-            return a.dataSources.map(function(a) {
-                return this._dataSourceProxies[a.id] = new DataSourceProxy(a);
-            }, this)
-        }))
-    },
-
     constructor: function() {
       Date.prototype.addDays = function (n) {
         var time = this.getTime();
         var changedDate = new Date(time + (n * 24 * 60 * 60 * 1000));
         this.setTime(changedDate.getTime());
         return this;
+      }
+
+      Array.prototype.addValue = function(k, v) {
+        var dfr = new Deferred();
+
+        var valObj = this.find(function (f) { return(f.name==k);});
+
+        if(valObj == undefined) {
+          valObj = (v == undefined) ? {name:k, children:[]} : {name:k, size:v};
+          this.push(valObj);
+        } else {
+          if(v != undefined) {
+            valObj["size"] += v;
+          }
+        }
+        dfr.resolve(valObj);
+        return dfr;
       }
     },
 
@@ -155,23 +160,6 @@ define([
         prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
         
         var getSumCounts = function(dfr, dataSources) {
-
-          Array.prototype.addValue = function(k, v) {
-            var dfr = new Deferred();
-
-            var valObj = this.find(function (f) { return(f.name==k);});
-
-            if(valObj == undefined) {
-              valObj = (v == undefined) ? {name:k, children:[]} : {name:k, size:v};
-              this.push(valObj);
-            } else {
-              if(v != undefined) {
-                valObj["size"] += v;
-              }
-            }
-            dfr.resolve(valObj);
-            return dfr;
-          };
 
           if(dataSources && dataSources.length > 0) {
             ageingRoot = {"name": "ageing", "children": []};
@@ -298,7 +286,9 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
-      console.log(dataSourceProxy.fields);
+      console.log('dataSourceConfig', dataSourceConfig);
+      console.log('dataSourceProxy', dataSourceProxy);
+      console.log('fields', dataSourceProxy.fields);
       //debugger;
       dataSourceProxy.fields.forEach(function(f) { if(f.name == 'feedback_obstype' || f.name == 'feedback_status') console.log(f);});
     },

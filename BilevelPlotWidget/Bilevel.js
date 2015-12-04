@@ -19,7 +19,7 @@ partition : d3.layout.partition()
 
 arc : d3.svg.arc()
     .startAngle(function(d) { return d.x; })
-    .endAngle(function(d) { return d.x + d.dx ; })
+    .endAngle(function(d) { return d.x + d.dx; })
     .padAngle(.01),
 
 key : function(d) {
@@ -32,7 +32,7 @@ fill : function (d) {
   var p = d;
   while (p.depth > 1) p = p.parent;
   var c = d3.lab(_private.hue(p.name));
-  c.l = _private.luminance(/*(10-d.depth) * */d.sum*30000);
+  c.l = _private.luminance((6-d.depth) * d.sum * 10000);
   return c;
 },
 
@@ -123,21 +123,27 @@ var _public = {
 
     //debugger
 
-    path.append("title").text(function(d) { return d.name+': '+d.sum;});
+    addCaption(path);
+
+    function addCaption(paths)
+    {
+      paths.select("title").remove();
+      paths.append("title").text(function(d) { return d.name+': '+d.sum;});
+    }
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
       d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.sum;
       if (!p.children) return;
       zoom(p, p);
-      path.append("title").text(function(d) { return d.name+': '+d.sum;});
+      addCaption(path);
     }
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
       d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+p.parent.sum;
       zoom(p.parent, p);
-      path.append("title").text(function(d) { return d.name+': '+d.sum;});
+      addCaption(path)
     }
 
     // Zoom to the specified new root.
