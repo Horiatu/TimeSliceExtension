@@ -156,3 +156,12 @@ body {
 svg {
   display: block;
 }
+
+.pathLabel {
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.pathLabel tspan{
+  fill: rgba(255,255,255,0.5);
+}

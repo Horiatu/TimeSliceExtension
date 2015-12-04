@@ -121,15 +121,39 @@ var _public = {
         .each(function(d) { this._current = _private.updateArc(d); })
         .on("click", zoomIn);
 
+// path.each(function() {
+
+//    d3.select( this.parentNode ).insert("node", function(){return this;} ) 
+//               //insert a new <g> element immediately before this element
+//      .attr("class", "wrapper") //set anything you want to on the <g>
+//      .append( function(){return this;} );
+//              //move the content element into the group
+
+// });
     //debugger
 
-    addCaption(path);
-
+    lastId = 0
     function addCaption(paths)
     {
+      var g = d3.select('g');
+
+      g.select('text').remove();
+      paths.each(function(d) { 
+        console.log(this,d);
+        if(this.id == '' ) this.id='p'+(lastId++);
+        g.append('text')
+          .attr('class', 'pathLabel')
+          .attr('x', '5%')
+          .attr('dy',12)
+        .append('textPath')
+          .attr('xlink:href', '#'+this.id).append('tspan').text(d.name)
+      });
+      
       paths.select("title").remove();
       paths.append("title").text(function(d) { return d.name+': '+d.sum;});
     }
+
+    addCaption(path);
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
