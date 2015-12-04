@@ -121,6 +121,8 @@ var _public = {
         .each(function(d) { this._current = _private.updateArc(d); })
         .on("click", zoomIn);
 
+    debugger
+
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
       d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.value;
