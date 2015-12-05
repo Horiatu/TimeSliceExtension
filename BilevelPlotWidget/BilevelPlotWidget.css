@@ -159,9 +159,13 @@ svg {
 
 .pathLabel {
   pointer-events: none;
-  font-size: 12px;
 }
 
 .pathLabel tspan{
-  fill: rgba(255,255,255,0.5);
+  font-size: 12px;
 }
+
+.helperPath {
+  fill: none;
+}
+

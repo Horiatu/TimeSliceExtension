@@ -133,24 +133,39 @@ var _public = {
     //debugger
 
     lastId = 0
+    g = d3.select('g')
+
     function addCaption(paths)
     {
-      var g = d3.select('g');
-
-      g.select('text').remove();
-      paths.each(function(d) { 
-        console.log(this,d);
-        if(this.id == '' ) this.id='p'+(lastId++);
-        g.append('text')
-          .attr('class', 'pathLabel')
-          .attr('x', '5%')
-          .attr('dy',12)
-        .append('textPath')
-          .attr('xlink:href', '#'+this.id).append('tspan').text(d.name)
-      });
-      
+      g.select('text.pathLabel').remove();
+      g.select('path.helperPath').remove();
       paths.select("title").remove();
-      paths.append("title").text(function(d) { return d.name+': '+d.sum;});
+      paths.each(function(d) { 
+        if(this.attributes['d'] != undefined) {
+          var x = this.attributes['d'].nodeValue.match(/M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
+          var l = d.fill.l;
+          var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.85)';
+          //console.log(l, txtColor);
+          var id = 'p'+(lastId++);
+
+          g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath');
+          var plen = d3.select('#'+id)[0][0].getTotalLength() * 0.90;
+          
+          var label=d.name+': '+d.sum;
+          var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(label);
+          var tlen = t[0][0].clientWidth;
+          g.select('#xxx').remove();
+          if(plen >= tlen) {
+            g.append('text')
+              .attr('class', 'pathLabel')
+              .attr('x', '2%')
+              .attr('dy', 20)
+            .append('textPath')
+              .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
+          }
+          d3.select(this).append("title").text(label);
+        }
+      });
     }
 
     addCaption(path);
@@ -160,14 +175,14 @@ var _public = {
       d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.sum;
       if (!p.children) return;
       zoom(p, p);
-      addCaption(path);
+      //addCaption(path);
     }
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
       d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+p.parent.sum;
       zoom(p.parent, p);
-      addCaption(path)
+      //addCaption(path)
     }
 
     // Zoom to the specified new root.
@@ -209,6 +224,12 @@ var _public = {
         path.exit().transition()
             .style("fill-opacity", function(d) { return d.depth === 1 + (root === p) ? 1 : 0; })
             .attrTween("d", function(d) { return _private.arcTween.call(this, exitArc(d)); })
+            .each(function(d, i) {
+              //console.log('start', this, i, d)
+              d3.select('text.pathLabel').remove();
+              d3.select('path.helperPath').remove();
+              d3.select(this).select("title").remove();
+            })
             .remove();
 
         path.enter().append("path")
@@ -219,7 +240,41 @@ var _public = {
 
         path.transition()
             .style("fill-opacity", 1)
-            .attrTween("d", function(d) { return _private.arcTween.call(this, _private.updateArc(d)); });
+            .attrTween("d", function(d) { return _private.arcTween.call(this, _private.updateArc(d)); })
+            .each('start', function(d, i) {
+              //console.log('start', this, i, d)
+              d3.select('text.pathLabel').remove();
+              d3.select('path.helperPath').remove();
+              d3.select(this).select("title").remove();
+            })
+            .each('end', function(d, i) {
+              //console.log('end')
+              var x = this.attributes['d'].nodeValue.match(/M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
+              var l = d.fill.l;
+              var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.85)';
+              //console.log(l, txtColor);
+              var id = 'p'+i;
+              //if(this.id == '' ) this.id=id;
+
+              g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath');
+              var plen = d3.select('#'+id)[0][0].getTotalLength() * 0.90;
+              //var bbox = d3.select('#t'+id)[0][0].getBBox();
+              
+              var label=d.name+': '+d.sum;
+              var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(label);
+              var tlen = t[0][0].clientWidth;
+              g.select('#xxx').remove();
+              if(plen >= tlen) {
+                g.append('text')
+                  .attr('class', 'pathLabel')
+                  .attr('x', '2%')
+                  .attr('dy', 20)
+                .append('textPath')
+                  .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
+              }
+              d3.select(this).append("title").text(label);
+
+            });
       });
     }
   },
