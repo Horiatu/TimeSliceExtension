@@ -195,9 +195,18 @@ var _public = {
 
     function renderKeys(key, t) {
       d3.select("#countText")[0][0].innerHTML = total = t;
-      d3.select("#key h1")[0][0].innerHTML = key;
+      //d3.select("#key h1")[0][0].innerHTML = key;
+      var keys = [];
+      if(key != '') {
+        keys = key.split(' > ');
+      }
+
+        var lis = d3.select('#key').selectAll('div').data(keys).text(String);
+
+        lis.enter().append('div').attr('class','keys').text(String);
+        lis.exit().remove();
     }
-    
+
     addCaption(path);
 
     function zoomIn(p) {
@@ -287,6 +296,7 @@ Init : function(dataFile, width) {
   _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
   
   var div = d3.select("#BilevelPlotDiv");
+  // d3.select("#key").append('ul');
 
   _private.svg = //d3.select("body")
   div.append("svg")
