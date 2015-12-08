@@ -179,3 +179,12 @@ svg {
   text-anchor: middle;
   pointer-events:none;
 }
+
+.keys {
+    margin: 2px 10px;
+    background-color: lightgray;
+    font-size: 12px;
+    font-weight: bolder;
+    padding: 2px 9px;
+    width: 100%;
+}
