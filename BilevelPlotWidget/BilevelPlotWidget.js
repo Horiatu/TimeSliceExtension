@@ -10,8 +10,6 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/Deferred",
-  "esri/opsdashboard/core/messageHandler",
-  "esri/opsdashboard/core/errorMessages",
   "esri/opsdashboard/DataSourceProxy",
   "esri/tasks/FeatureSet",
   "dijit/_WidgetBase",
@@ -20,7 +18,7 @@ define([
   "esri/tasks/query",
   "dojo/text!./BilevelPlotWidgetTemplate.html"
 ], function (declare, lang, 
-  Deferred, Msg, ErrorMessages, 
+  Deferred, 
   DataSourceProxy, FeatureSet,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Query, templateString) {
 

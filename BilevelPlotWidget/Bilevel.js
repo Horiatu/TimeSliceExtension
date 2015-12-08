@@ -252,21 +252,15 @@ var _public = {
             })
             .each('end', function(d, i) {
               
-              var firstArcSection = /(^.+?A(-?\d+(\.\d+)?))\s+(-?\d+(\.\d+)?)\s+([0|1])\s+([0|1])\s+([0|1])\s+(-?\d+(\.\d+)?)\s+(-?\d+(\.\d+)?)/
-              // /(^.+?)[L|M|A]/;
+              var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
               var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
-                    //this.attributes['d'].nodeValue.match(/(^.+?)L/)[0];// /M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
-              // x = x.replace(/,/g , " ");
               var l = d.fill.l;
               var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
               //console.log(l, txtColor);
               var id = 'p'+i;
-              //if(this.id == '' ) this.id=id;
-
-
+       
               var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
               var plen = parc.getTotalLength();
-              //var bbox = d3.select('#t'+id)[0][0].getBBox();
               
               var getLength = function(text) {
                 var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(text);
@@ -315,8 +309,7 @@ var _public = {
                 .append('textPath')
                   .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
               }
-              
-
+ 
             });
       });
     }
