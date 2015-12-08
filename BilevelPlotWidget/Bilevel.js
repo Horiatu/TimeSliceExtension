@@ -59,7 +59,7 @@ var _public = {
 
   Plot : function(root) {
 
-    console.log(root, _private.partition.nodes(root))
+    // console.log(root, _private.partition.nodes(root))
 
     // Compute the initial layout on the entire tree to sum sizes.
     // Also compute the full name and fill color for each node,
@@ -99,15 +99,14 @@ var _public = {
       center = _private.svg.append("circle")
           .attr('id','center')
           .attr("r", _private.radius / 3)
-          .on("click", zoomOut);
-
-      center
-      .append('g').append('image')
-        .attr("xlink:href", "CanadaMapComunityLogo-64x64.png")
-         .attr('width', 64)
-         .attr('height', 64);
-
+          .on("click", zoomOut)
+        
       center.append("title").text("zoom out");
+      d3.select('g').append('text')
+          .attr('x', 0).attr('y','50')
+          .attr('id', 'countText')
+          .attr('title', 'Total')
+          .text('00');
     }
     else {
       center = center[0][0];
@@ -121,51 +120,74 @@ var _public = {
         .each(function(d) { this._current = _private.updateArc(d); })
         .on("click", zoomIn);
 
-// path.each(function() {
-
-//    d3.select( this.parentNode ).insert("node", function(){return this;} ) 
-//               //insert a new <g> element immediately before this element
-//      .attr("class", "wrapper") //set anything you want to on the <g>
-//      .append( function(){return this;} );
-//              //move the content element into the group
-
-// });
-    //debugger
-
-    lastId = 0
     g = d3.select('g')
+
+    function render(data, i) {
+      var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
+      var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
+      var l = data.fill.l;
+      var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
+      //console.log(l, txtColor);
+      var id = 'p'+i;
+
+      var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
+      var plen = parc.getTotalLength();
+      
+      var getLength = function(text) {
+        var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(text);
+        var tlen = t[0][0].clientWidth;
+        g.select('#xxx').remove();
+        return tlen;
+      }
+
+      var pc = (data.sum/total*100).toFixed(0)+'%';
+      var label=data.name+': '+data.sum + ' ('+pc+')';
+      d3.select(this).append("title").text(label);
+
+      var tlen = getLength(label);
+      if(plen * 0.90 < tlen) {
+        tlen = getLength(label = data.sum + ' ('+pc+')');
+
+        if(plen * 0.90 < tlen) {
+          tlen = getLength(label = pc);
+        }
+      }
+
+      if(plen * 0.90 >= tlen) {
+
+        // http://www.visualcinnamon.com/2015/09/placing-text-on-arcs.html
+        var p0 = parc.getPointAtLength(0);
+        var p1 = parc.getPointAtLength(plen);
+        //console.log({p0:p0, p1:p1, l:label});
+        dy=20;
+        if(p0.x>p1.x) {
+          
+          var xxx = /0 (?:0|1) 1/.exec(x)[0];
+          var newStart = x.match(xxx+'(.*?)$')[1];
+          var middleSec = x.match('A(.*?)'+xxx)[1]
+          var newEnd = /M(.*?)A/.exec( x )[1];
+          
+          //Build up the new arc notation, set the sweep-flag to 0
+          var newArc = "M" + newStart + "A" + middleSec + '1 '+xxx[2]+' 0 ' + newEnd;
+          d3.select(parc).attr('d',newArc);
+          dy=-13;
+        }
+
+        g.append('text')
+          .attr('class', 'pathLabel')
+          .attr('x', (plen-tlen)/2)
+          .attr('dy', dy)
+        .append('textPath')
+          .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
+      }
+    };
 
     function addCaption(paths)
     {
       g.select('text.pathLabel').remove();
       g.select('path.helperPath').remove();
       paths.select("title").remove();
-      paths.each(function(d) { 
-        if(this.attributes['d'] != undefined) {
-          var x = this.attributes['d'].nodeValue.match(/M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
-          var l = d.fill.l;
-          var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
-          //console.log(l, txtColor);
-          var id = 'p'+(lastId++);
-
-          g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath');
-          var plen = d3.select('#'+id)[0][0].getTotalLength();
-          
-          var label=d.name+': '+d.sum; // + '('+(d.sum/total*100).toFixed(1)+'%)';
-          var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(label);
-          var tlen = t[0][0].clientWidth;
-          g.select('#xxx').remove();
-          if(plen * 0.90 >= tlen) {
-            g.append('text')
-              .attr('class', 'pathLabel')
-              .attr('x', (plen-tlen)/2)
-              .attr('dy', 20)
-            .append('textPath')
-              .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
-          }
-          d3.select(this).append("title").text(label);
-        }
-      });
+      paths.each(render);
     }
 
     total = 0
@@ -174,7 +196,8 @@ var _public = {
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
       total = p.sum;
-      d3.select("#key h1")[0][0].innerHTML = p.key+": "+total;
+      d3.select("#key h1")[0][0].innerHTML = p.key;
+      d3.select("#countText")[0][0].innerHTML = total;
       if (!p.children) return;
       zoom(p, p);
       //addCaption(path);
@@ -183,7 +206,8 @@ var _public = {
     function zoomOut(p) {
       if (!p || !p.parent) return;
       total = p.parent.sum;
-      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+total;
+      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key):'');
+      d3.select("#countText")[0][0].innerHTML = total;
       zoom(p.parent, p);
       //addCaption(path)
     }
@@ -250,67 +274,7 @@ var _public = {
               d3.select('path.helperPath').remove();
               d3.select(this).select("title").remove();
             })
-            .each('end', function(d, i) {
-              
-              var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
-              var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
-              var l = d.fill.l;
-              var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
-              //console.log(l, txtColor);
-              var id = 'p'+i;
-       
-              var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
-              var plen = parc.getTotalLength();
-              
-              var getLength = function(text) {
-                var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(text);
-                var tlen = t[0][0].clientWidth;
-                g.select('#xxx').remove();
-                return tlen;
-              }
-
-              var pc = (d.sum/total*100).toFixed(0)+'%';
-              var label=d.name+': '+d.sum + ' ('+pc+')';
-              d3.select(this).append("title").text(label);
-
-              var tlen = getLength(label);
-              if(plen * 0.90 < tlen) {
-                tlen = getLength(label = d.sum + ' ('+pc+')');
-
-                if(plen * 0.90 < tlen) {
-                  tlen = getLength(label = pc);
-                }
-              }
-
-              if(plen * 0.90 >= tlen) {
-
-                // http://www.visualcinnamon.com/2015/09/placing-text-on-arcs.html
-                var p0 = parc.getPointAtLength(0);
-                var p1 = parc.getPointAtLength(plen);
-                //console.log({p0:p0, p1:p1, l:label});
-                dy=20;
-                if(p0.x>p1.x) {
-                  
-                  var xxx = /0 (?:0|1) 1/.exec(x)[0];
-                  var newStart = x.match(xxx+'(.*?)$')[1];
-                  var middleSec = x.match('A(.*?)'+xxx)[1]
-                  var newEnd = /M(.*?)A/.exec( x )[1];
-                  
-                  //Build up the new arc notation, set the sweep-flag to 0
-                  var newArc = "M" + newStart + "A" + middleSec + '1 '+xxx[2]+' 0 ' + newEnd;
-                  d3.select(parc).attr('d',newArc);
-                  dy=-13;
-                }
-
-                g.append('text')
-                  .attr('class', 'pathLabel')
-                  .attr('x', (plen-tlen)/2)
-                  .attr('dy', dy)
-                .append('textPath')
-                  .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
-              }
- 
-            });
+            .each('end', render);
       });
     }
   },

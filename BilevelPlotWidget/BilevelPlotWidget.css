@@ -172,3 +172,10 @@ svg {
   --stroke: black;
 }
 
+#countText {
+  font-size: 24px;
+  font-weight: bold;
+  fill: gray;
+  text-anchor: middle;
+  pointer-events:none;
+}
