@@ -162,10 +162,13 @@ svg {
 }
 
 .pathLabel tspan{
+  font-family: 'arial narrow';
   font-size: 12px;
+  font-weight: bolder;
 }
 
 .helperPath {
   fill: none;
+  --stroke: black;
 }
 

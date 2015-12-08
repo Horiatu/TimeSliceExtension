@@ -144,21 +144,21 @@ var _public = {
         if(this.attributes['d'] != undefined) {
           var x = this.attributes['d'].nodeValue.match(/M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
           var l = d.fill.l;
-          var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.85)';
+          var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
           //console.log(l, txtColor);
           var id = 'p'+(lastId++);
 
           g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath');
-          var plen = d3.select('#'+id)[0][0].getTotalLength() * 0.90;
+          var plen = d3.select('#'+id)[0][0].getTotalLength();
           
-          var label=d.name+': '+d.sum;
+          var label=d.name+': '+d.sum; // + '('+(d.sum/total*100).toFixed(1)+'%)';
           var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(label);
           var tlen = t[0][0].clientWidth;
           g.select('#xxx').remove();
-          if(plen >= tlen) {
+          if(plen * 0.90 >= tlen) {
             g.append('text')
               .attr('class', 'pathLabel')
-              .attr('x', '2%')
+              .attr('x', (plen-tlen)/2)
               .attr('dy', 20)
             .append('textPath')
               .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
@@ -168,11 +168,13 @@ var _public = {
       });
     }
 
+    total = 0
     addCaption(path);
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
-      d3.select("#key h1")[0][0].innerHTML = p.key+": "+p.sum;
+      total = p.sum;
+      d3.select("#key h1")[0][0].innerHTML = p.key+": "+total;
       if (!p.children) return;
       zoom(p, p);
       //addCaption(path);
@@ -180,7 +182,8 @@ var _public = {
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
-      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+p.parent.sum;
+      total = p.parent.sum;
+      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key+": "):'Total: ')+total;
       zoom(p.parent, p);
       //addCaption(path)
     }
@@ -248,31 +251,71 @@ var _public = {
               d3.select(this).select("title").remove();
             })
             .each('end', function(d, i) {
-              //console.log('end')
-              var x = this.attributes['d'].nodeValue.match(/M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
+              
+              var firstArcSection = /(^.+?A(-?\d+(\.\d+)?))\s+(-?\d+(\.\d+)?)\s+([0|1])\s+([0|1])\s+([0|1])\s+(-?\d+(\.\d+)?)\s+(-?\d+(\.\d+)?)/
+              // /(^.+?)[L|M|A]/;
+              var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
+                    //this.attributes['d'].nodeValue.match(/(^.+?)L/)[0];// /M(\d|\.|,|\s|-)+A(\d|\.|,|\s|-)+/)[0];
+              // x = x.replace(/,/g , " ");
               var l = d.fill.l;
-              var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.85)';
+              var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
               //console.log(l, txtColor);
               var id = 'p'+i;
               //if(this.id == '' ) this.id=id;
 
-              g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath');
-              var plen = d3.select('#'+id)[0][0].getTotalLength() * 0.90;
+
+              var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
+              var plen = parc.getTotalLength();
               //var bbox = d3.select('#t'+id)[0][0].getBBox();
               
-              var label=d.name+': '+d.sum;
-              var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(label);
-              var tlen = t[0][0].clientWidth;
-              g.select('#xxx').remove();
-              if(plen >= tlen) {
+              var getLength = function(text) {
+                var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(text);
+                var tlen = t[0][0].clientWidth;
+                g.select('#xxx').remove();
+                return tlen;
+              }
+
+              var pc = (d.sum/total*100).toFixed(0)+'%';
+              var label=d.name+': '+d.sum + ' ('+pc+')';
+              d3.select(this).append("title").text(label);
+
+              var tlen = getLength(label);
+              if(plen * 0.90 < tlen) {
+                tlen = getLength(label = d.sum + ' ('+pc+')');
+
+                if(plen * 0.90 < tlen) {
+                  tlen = getLength(label = pc);
+                }
+              }
+
+              if(plen * 0.90 >= tlen) {
+
+                // http://www.visualcinnamon.com/2015/09/placing-text-on-arcs.html
+                var p0 = parc.getPointAtLength(0);
+                var p1 = parc.getPointAtLength(plen);
+                //console.log({p0:p0, p1:p1, l:label});
+                dy=20;
+                if(p0.x>p1.x) {
+                  
+                  var xxx = /0 (?:0|1) 1/.exec(x)[0];
+                  var newStart = x.match(xxx+'(.*?)$')[1];
+                  var middleSec = x.match('A(.*?)'+xxx)[1]
+                  var newEnd = /M(.*?)A/.exec( x )[1];
+                  
+                  //Build up the new arc notation, set the sweep-flag to 0
+                  var newArc = "M" + newStart + "A" + middleSec + '1 '+xxx[2]+' 0 ' + newEnd;
+                  d3.select(parc).attr('d',newArc);
+                  dy=-13;
+                }
+
                 g.append('text')
                   .attr('class', 'pathLabel')
-                  .attr('x', '2%')
-                  .attr('dy', 20)
+                  .attr('x', (plen-tlen)/2)
+                  .attr('dy', dy)
                 .append('textPath')
                   .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
               }
-              d3.select(this).append("title").text(label);
+              
 
             });
       });
