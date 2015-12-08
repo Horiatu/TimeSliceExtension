@@ -182,34 +182,36 @@ var _public = {
       }
     };
 
+    total = 0;
     function addCaption(paths)
     {
       g.select('text.pathLabel').remove();
       g.select('path.helperPath').remove();
       paths.select("title").remove();
+      paths.each(function(p,i) {if(p.depth==1) total+=p.sum});
+      renderKeys('', total);
       paths.each(render);
     }
 
-    total = 0
+    function renderKeys(key, t) {
+      d3.select("#countText")[0][0].innerHTML = total = t;
+      d3.select("#key h1")[0][0].innerHTML = key;
+    }
+    
     addCaption(path);
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
-      total = p.sum;
-      d3.select("#key h1")[0][0].innerHTML = p.key;
-      d3.select("#countText")[0][0].innerHTML = total;
+      renderKeys(p.key, p.sum);
       if (!p.children) return;
       zoom(p, p);
-      //addCaption(path);
     }
 
     function zoomOut(p) {
       if (!p || !p.parent) return;
-      total = p.parent.sum;
-      d3.select("#key h1")[0][0].innerHTML = (p.parent.key!=''?(p.parent.key):'');
-      d3.select("#countText")[0][0].innerHTML = total;
+      renderKeys(p.parent.key!='' ? p.parent.key : '', p.parent.sum);
+      
       zoom(p.parent, p);
-      //addCaption(path)
     }
 
     // Zoom to the specified new root.
