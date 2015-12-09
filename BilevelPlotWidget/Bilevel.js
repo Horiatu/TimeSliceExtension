@@ -37,7 +37,7 @@ fill : function (d) {
 },
 
 lum : function(d) {
-  return _private.luminance((6-d.depth) * d.sum * 10000);
+  return _private.luminance((6-d.depth)/2 * d.sum * 10000);
 },
 
 txtColor : function(d) {
@@ -60,12 +60,49 @@ updateArc : function (d) {
 
 var _public = {
 
-  Clear : function() {
-    // _private.partition = d3.layout.partition()
-    //   .sort(function(a, b) { return d3.ascending(a.name, b.name); });
+  Clear : function(width) {
+    var m = width/2-20;
+    _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+    _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
+
+    // var m = width/2-20;
+    // _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+    // _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
+    
+    // var div = d3.select("#BilevelPlotDiv");
+    // // d3.select("#key").append('ul');
+
+    // _private.svg = //d3.select("body")
+    // div.append("svg")
+    //   .attr("width", _private.margin.left + _private.margin.right + 20)
+    //   .attr("height", _private.margin.top + _private.margin.bottom + 20)
+    // .append("g")
+    //   .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
+
+    // _private.partition.size([2 * Math.PI, _private.radius]);
+
+    // _private.arc.padRadius(_private.radius / 3)
+    //   .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
+    //   .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
   },
 
   Plot : function(root) {
+    var div = d3.select("#BilevelPlotDiv");
+    div[0][0].innerHTML ='';
+
+    _private.svg = 
+      div.append("svg")
+        .attr("width", _private.margin.left + _private.margin.right + 20)
+        .attr("height", _private.margin.top + _private.margin.bottom + 20)
+      .append("g")
+        .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
+
+    _private.partition.size([2 * Math.PI, _private.radius]);
+
+    _private.arc.padRadius(_private.radius / 3)
+      .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
+      .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
+
 
     // console.log(root, _private.partition.nodes(root))
 
@@ -307,20 +344,19 @@ var _public = {
     _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
     
     var div = d3.select("#BilevelPlotDiv");
-    // d3.select("#key").append('ul');
 
-    _private.svg = //d3.select("body")
-    div.append("svg")
-      .attr("width", _private.margin.left + _private.margin.right + 20)
-      .attr("height", _private.margin.top + _private.margin.bottom + 20)
-    .append("g")
-      .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
+    // _private.svg = 
+    //   div.append("svg")
+    //     .attr("width", _private.margin.left + _private.margin.right + 20)
+    //     .attr("height", _private.margin.top + _private.margin.bottom + 20)
+    //   .append("g")
+    //     .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
 
-    _private.partition.size([2 * Math.PI, _private.radius]);
+    // _private.partition.size([2 * Math.PI, _private.radius]);
 
-    _private.arc.padRadius(_private.radius / 3)
-      .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
-      .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
+    // _private.arc.padRadius(_private.radius / 3)
+    //   .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
+    //   .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
 
     d3.json(dataFile, function(error, root) {
       Bilevel.Plot(root);

@@ -10,6 +10,7 @@ define([
   "dojo/_base/declare",
   "dojo/_base/lang",
   "dojo/Deferred",
+  "esri/opsdashboard/core/messageHandler",
   "esri/opsdashboard/DataSourceProxy",
   "esri/tasks/FeatureSet",
   "dijit/_WidgetBase",
@@ -18,7 +19,7 @@ define([
   "esri/tasks/query",
   "dojo/text!./BilevelPlotWidgetTemplate.html"
 ], function (declare, lang, 
-  Deferred, 
+  Deferred, Msg,
   DataSourceProxy, FeatureSet,
   _WidgetBase, _TemplatedMixin, WidgetProxy, Query, templateString) {
 
@@ -54,8 +55,8 @@ define([
 
     postCreate: function () {
       this.inherited(arguments);
-
-      Bilevel.Init("ageing1.json", d3.select("body")[0][0].clientWidth);
+      Bilevel.Clear(d3.select("body")[0][0].clientWidth);
+      //Bilevel.Init("ageing1.json", d3.select("body")[0][0].clientWidth);
     },
 
     hostReady: function(){
@@ -69,7 +70,12 @@ define([
         })
       );
       totalDays.addEventListener("change", lang.hitch(this, function(v) { 
-          this.getDataSourceProxies().then( this.getContsByDates );
+          this.getDataSourceProxies().then( 
+            //this.getContsByDates 
+            lang.hitch(this, function(ds) {
+              this.getContsByDates(ds)
+            })
+            );
         })
       );
       period.addEventListener("input", lang.hitch(this, function(v) { 
@@ -77,7 +83,12 @@ define([
         })
       );
       period.addEventListener("change", lang.hitch(this, function(v) { 
-          this.getDataSourceProxies().then( this.getContsByDates );
+          this.getDataSourceProxies().then( 
+            // this.getContsByDates 
+            lang.hitch(this, function(ds) {
+              this.getContsByDates(ds)
+            })
+            );
         })
       );
 
@@ -110,10 +121,7 @@ define([
     ageingRoot : {},
 
     getContsByDates : function(dataSources) {
-      document.dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
-      //console.log(dataSources);
-      
-      //this.document.getElementById('countList').innerHTML = '';
+      dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
 
       var executeQuery = function(ds, query) {
         return Msg._sendMessageWithReply({
@@ -178,10 +186,15 @@ define([
                                   r.children.addValue(f.attributes.mgmt_data_source).then(function (r){
                                     r.children.addValue(f.attributes.Creator).then(function (r){
                                       r.children.addValue('Type '+f.attributes['feedback_obstype']).then(function (r){
-                                        r.children.addValue("Status "+f.attributes['feedback_status'], 1).then(function (r){
-                                          //console.log(ageingRoot, r);
-                                          throw BreakException;
-                                        })
+                                        r.children.addValue("Status "+f.attributes['feedback_status'], 10).then(
+                                          function (r){
+                                            //console.log(ageingRoot, r);
+                                            throw BreakException;
+                                          },
+                                          function (err){
+                                            console.log('ageingRoot', err);
+                                          }
+                                        )
                                       })
                                     });
                                   });
@@ -190,16 +203,21 @@ define([
                             }
                         }
                     } catch(e) {
-                        if (e!==BreakException) throw e;
+                      if (e!==BreakException) {
+                        throw e;
+                      }
+                      else {
+                        console.error(e);
+                      }
                     }
                 })
               }),
               function(err) { 
-                console.log(err.error.code + ": " + err.error.description);
+                console.log(err.error.code + ": " + err.error.description, err);
               }
             ).always(function() {
               if(dataSources.length > 0) {
-                getSumCounts(dfr, dataSources);
+                return getSumCounts(dfr, dataSources);
               }
               else {
                 dfr.resolve(prevDates);
@@ -216,74 +234,27 @@ define([
         return dfr;
       };
 
-      exec(new Deferred).then(function(results) {
+      exec(new Deferred).then(
+        function(results) {
 
-          //console.log(results);
+          //console.log(results,JSON.stringify(results.ageingRoot));
+          // return;
 
-          // Bilevel.Clear();
-          console.log(JSON.stringify(results.ageingRoot));
-          return;
-          // Bilevel.Plot(results.ageingRoot);
+          //var root = JSON.parse(JSON.stringify(results.ageingRoot));
 
-          var countList = this.document.getElementById('countList');
-          countList.innerHTML = '';
+          //Bilevel.Clear();
+          Bilevel.Plot(results.ageingRoot);
 
-          //var 
-          dsnArr=[];
-          
-          var c = 0;
-
-          var total = 0;
-          for(var cnt in results.prevDates) {
-            total += results.prevDates[cnt].count;
-          }
-
-          var liTotal = this.document.createElement('li');
-          liTotal.className = 'legend title';
-          liTotal.appendChild(document.createTextNode('Selected Incidents: '+total));
-          countList.appendChild(liTotal);
-
-          for(var key in results.prevDates) {
-            var countsStr = key;
-            
-            if(results.prevDates[key].count>0){
-              var li = this.document.createElement('li');
-              li.className = 'legend';
-              li.setAttribute('tabindex', 0);
-              var m = document.createElement('div');
-              m.style['background-color']='black';//colors[c];
-
-              li.appendChild(m);
-              li.appendChild(document.createTextNode(countsStr+"  -  "));
-
-              var countNode = document.createElement('div');
-              countNode.className = 'title';
-              countNode.appendChild(document.createTextNode(results.prevDates[key].count));
-              li.appendChild(countNode);
-              countList.appendChild(li);
-
-              dsnArr.push({
-                y: results.prevDates[key].count,
-                text: (results.prevDates[key].count/total*100).toFixed(1)+"%",
-                tooltip: countsStr +" : "+results.prevDates[key].count,
-                fontSize: 14,
-                fontColor: 'black',
-                color: 'black',// colors[c],
-                "data-ids" : results.prevDates[key].features
-              });
-              //c = (c+1) % colors.length;
-            }
-          };
-          // chart.addSeries("Incidents", dsnArr);
-          // chart.render();
-          document.getElementById('LegendDiv').style["min-height"] = Math.max(
-            document.getElementById('countList').offsetHeight,
-            document.getElementById('TotalPeriod1').offsetHeight
-            )+'px';
-      })
+        },
+        function(error) {
+          console.error('exec', error)
+        }
+      )
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
+      Bilevel.Clear(d3.select("body")[0][0].clientWidth);
+      this.getDataSourceProxies().then( lang.hitch(this, function(ds) {this.getContsByDates(ds)}))
     },
 
   });
