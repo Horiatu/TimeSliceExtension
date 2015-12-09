@@ -182,9 +182,23 @@ svg {
 
 .keys {
     margin: 2px 10px;
-    background-color: lightgray;
+    background-color: gray;
+    color:aliceblue;
     font-size: 12px;
     font-weight: bolder;
     padding: 2px 9px;
     width: 100%;
+}
+
+.keys:hover {
+  background-color: black;
+}
+
+.keyName, .keyValue {
+  display: inline-block;
+  pointer-events: none;
+}
+
+.keyValue {
+  float:right;
 }

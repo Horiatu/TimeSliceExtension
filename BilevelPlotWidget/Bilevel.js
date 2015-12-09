@@ -24,7 +24,7 @@ arc : d3.svg.arc()
 
 key : function(d) {
   var k = []; p = d;
-  while (p.depth) k.push(p.name), p = p.parent;
+  while (p.depth) k.push(p.name+', '+p.sum), p = p.parent;
   return k.reverse().join(" > ");
 },
 
@@ -201,18 +201,20 @@ var _public = {
         keys = key.split(' > ');
       }
 
-        var lis = d3.select('#key').selectAll('div').data(keys).text(String);
+      var lis = d3.select('#key').selectAll('div.keys').data(keys);
+      var li = lis.enter().append('div').attr('class','keys')
+      li.append('div').attr('class','keyName').text(function(k) {var ss = k.split(', '); return ss[0]});
+      li.append('div').attr('class','keyValue').text(function(k) {var ss = k.split(', '); return ss[1]});
 
-        lis.enter().append('div').attr('class','keys').text(String);
-        lis.exit().remove();
+      lis.exit().remove();
     }
 
     addCaption(path);
 
     function zoomIn(p) {
       if (p.depth > 1) p = p.parent;
-      renderKeys(p.key, p.sum);
       if (!p.children) return;
+      renderKeys(p.key, p.sum);
       zoom(p, p);
     }
 
