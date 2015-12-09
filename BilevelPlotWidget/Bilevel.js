@@ -24,7 +24,7 @@ arc : d3.svg.arc()
 
 key : function(d) {
   var k = []; p = d;
-  while (p.depth) k.push(p.name+', '+p.sum), p = p.parent;
+  while (p.depth) k.push(p.name+', '+p.sum+', '+this.fill(d)+', '+this.txtColor(d)), p = p.parent;
   return k.reverse().join(" > ");
 },
 
@@ -32,8 +32,16 @@ fill : function (d) {
   var p = d;
   while (p.depth > 1) p = p.parent;
   var c = d3.lab(_private.hue(p.name));
-  c.l = _private.luminance((6-d.depth) * d.sum * 10000);
+  c.l = this.lum(d);
   return c;
+},
+
+lum : function(d) {
+  return _private.luminance((6-d.depth) * d.sum * 10000);
+},
+
+txtColor : function(d) {
+  return this.lum(d)<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)'
 },
 
 arcTween : function(b) {
@@ -75,6 +83,7 @@ var _public = {
           d.sum = d.value;
           d.key = _private.key(d);
           d.fill = _private.fill(d);
+          d.txtColor = _private.txtColor(d);//.lum(d)<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)'
         });
 
     // Now redefine the value function to use the previously-computed sum.
@@ -126,7 +135,7 @@ var _public = {
       var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
       var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
       var l = data.fill.l;
-      var txtColor = l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
+      var txtColor = data.txtColor;//l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
       //console.log(l, txtColor);
       var id = 'p'+i;
 
@@ -203,6 +212,16 @@ var _public = {
 
       var lis = d3.select('#key').selectAll('div.keys').data(keys);
       var li = lis.enter().append('div').attr('class','keys')
+      .style('background-color',function(k) {
+        var ss = k.split(', '); 
+        //console.log(ss[2], ss[2].l)
+        return ss[2]
+      })
+      .style('color',function(k) {
+        var ss = k.split(', '); 
+        //console.log(ss[2], ss[2].l)
+        return ss[3]
+      })
       li.append('div').attr('class','keyName').text(function(k) {var ss = k.split(', '); return ss[0]});
       li.append('div').attr('class','keyValue').text(function(k) {var ss = k.split(', '); return ss[1]});
 
