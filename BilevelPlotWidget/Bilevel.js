@@ -24,8 +24,8 @@ arc : d3.svg.arc()
 
 key : function(d) {
   var k = []; p = d;
-  while (p.depth) k.push(p.name+', '+p.sum+', '+this.fill(d)+', '+this.txtColor(d)), p = p.parent;
-  return k.reverse().join(" > ");
+  while (p.depth) k.push([p.name, p.sum, this.fill(d), this.txtColor(d)]), p = p.parent;
+  return k.reverse()
 },
 
 fill : function (d) {
@@ -83,7 +83,7 @@ var _public = {
           d.sum = d.value;
           d.key = _private.key(d);
           d.fill = _private.fill(d);
-          d.txtColor = _private.txtColor(d);//.lum(d)<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)'
+          d.txtColor = _private.txtColor(d);
         });
 
     // Now redefine the value function to use the previously-computed sum.
@@ -135,8 +135,7 @@ var _public = {
       var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
       var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
       var l = data.fill.l;
-      var txtColor = data.txtColor;//l<70 ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)';
-      //console.log(l, txtColor);
+      var txtColor = data.txtColor;
       var id = 'p'+i;
 
       var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
@@ -204,26 +203,17 @@ var _public = {
 
     function renderKeys(key, t) {
       d3.select("#countText")[0][0].innerHTML = total = t;
-      //d3.select("#key h1")[0][0].innerHTML = key;
       var keys = [];
       if(key != '') {
-        keys = key.split(' > ');
+        keys = key
       }
 
       var lis = d3.select('#key').selectAll('div.keys').data(keys);
       var li = lis.enter().append('div').attr('class','keys')
-      .style('background-color',function(k) {
-        var ss = k.split(', '); 
-        //console.log(ss[2], ss[2].l)
-        return ss[2]
-      })
-      .style('color',function(k) {
-        var ss = k.split(', '); 
-        //console.log(ss[2], ss[2].l)
-        return ss[3]
-      })
-      li.append('div').attr('class','keyName').text(function(k) {var ss = k.split(', '); return ss[0]});
-      li.append('div').attr('class','keyValue').text(function(k) {var ss = k.split(', '); return ss[1]});
+      .style('background-color',function(k) {return k[2]})
+      .style('color',function(k) {return k[3]})
+      li.append('div').attr('class','keyName').text(function(k) {return k[0]});
+      li.append('div').attr('class','keyValue').text(function(k) {return k[1]});
 
       lis.exit().remove();
     }
@@ -311,35 +301,33 @@ var _public = {
     }
   },
 
-Init : function(dataFile, width) {
-  var m = width/2-20;
-  _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
-  _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
+  Init : function(dataFile, width) {
+    var m = width/2-20;
+    _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+    _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
+    
+    var div = d3.select("#BilevelPlotDiv");
+    // d3.select("#key").append('ul');
+
+    _private.svg = //d3.select("body")
+    div.append("svg")
+      .attr("width", _private.margin.left + _private.margin.right + 20)
+      .attr("height", _private.margin.top + _private.margin.bottom + 20)
+    .append("g")
+      .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
+
+    _private.partition.size([2 * Math.PI, _private.radius]);
+
+    _private.arc.padRadius(_private.radius / 3)
+      .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
+      .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
+
+    d3.json(dataFile, function(error, root) {
+      Bilevel.Plot(root);
+    });
+
+  }};
   
-  var div = d3.select("#BilevelPlotDiv");
-  // d3.select("#key").append('ul');
-
-  _private.svg = //d3.select("body")
-  div.append("svg")
-    .attr("width", _private.margin.left + _private.margin.right + 20)
-    .attr("height", _private.margin.top + _private.margin.bottom + 20)
-  .append("g")
-    .attr("transform", "translate(" + (_private.margin.left+10) + "," + (_private.margin.top+10) + ")");
-
-  _private.partition.size([2 * Math.PI, _private.radius]);
-
-  _private.arc.padRadius(_private.radius / 3)
-    .innerRadius(function(d) { return _private.radius / 3 * d.depth; })
-    .outerRadius(function(d) { return _private.radius / 3 * (d.depth + 1) - 1; });
-
-  d3.json(dataFile, function(error, root) {
-    Bilevel.Plot(root);
-  });
-
-}};
-    return _public;
+  return _public;
 
 }();
-
-
-//Bilevel.init("flare.json");
