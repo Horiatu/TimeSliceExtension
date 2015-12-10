@@ -35,28 +35,36 @@ define([
         return this;
       }
 
-      Array.prototype.addValue = function(k, v) {
-        var dfr = new Deferred();
-
-        var valObj = this.find(function (f) { return(f.name==k);});
+      ChildrenArray = Array;
+      ChildrenArray.prototype.addValue = function(k, id, v) {
+        var valObj = undefined;
+        this.some(function(f,i) {
+          if(f.name == k) {
+            valObj = f;
+            return true;
+          }
+          return false;
+        })
 
         if(valObj == undefined) {
-          valObj = (v == undefined) ? {name:k, children:[]} : {name:k, size:v};
+          valObj = (v == undefined) 
+            ? {name:k, fids:[id], children:new ChildrenArray} 
+            : {name:k, fids:[id], size:v};
           this.push(valObj);
         } else {
+          valObj.fids.push(id)
           if(v != undefined) {
-            valObj["size"] += v;
+            valObj.size += v;
           }
         }
-        dfr.resolve(valObj);
-        return dfr;
+
+        return valObj;
       }
     },
 
     postCreate: function () {
       this.inherited(arguments);
-      Bilevel.Clear(d3.select("body")[0][0].clientWidth);
-      //Bilevel.Init("ageing1.json", d3.select("body")[0][0].clientWidth);
+      Bilevel.Init(d3.select("body")[0][0].clientWidth);
     },
 
     hostReady: function(){
@@ -69,26 +77,25 @@ define([
           document.getElementById("totalDaysCount").innerHTML = totalDays.value;
         })
       );
+
       totalDays.addEventListener("change", lang.hitch(this, function(v) { 
           this.getDataSourceProxies().then( 
-            //this.getContsByDates 
             lang.hitch(this, function(ds) {
               this.getContsByDates(ds)
-            })
-            );
+            }));
         })
       );
+
       period.addEventListener("input", lang.hitch(this, function(v) { 
           document.getElementById("periodCount").innerHTML = period.value;
         })
       );
+
       period.addEventListener("change", lang.hitch(this, function(v) { 
           this.getDataSourceProxies().then( 
-            // this.getContsByDates 
             lang.hitch(this, function(ds) {
               this.getContsByDates(ds)
-            })
-            );
+            }));
         })
       );
 
@@ -120,9 +127,7 @@ define([
 
     ageingRoot : {},
 
-    getContsByDates : function(dataSources) {
-      dataSources = dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0});
-
+    PlotContsByDates : function(dataSources) {
       var executeQuery = function(ds, query) {
         return Msg._sendMessageWithReply({
           functionName: "executeQuery",
@@ -146,7 +151,7 @@ define([
       };
 
       var exec = function(dfr) {
-        var today=new Date();
+        var today = new Date();
 
         var query = new Query();
         query.outFields = ["objectid", "CreationDate", "Creator", "feedback_obstype", "feedback_status", "mgmt_data_source"];
@@ -168,61 +173,55 @@ define([
         var getSumCounts = function(dfr, dataSources) {
 
           if(dataSources && dataSources.length > 0) {
-            ageingRoot = {"name": "ageing", "children": []};
+            ageingRoot = {"name": "ageing", "children": new ChildrenArray};
+
             executeQuery(dataSources.pop(), query).then(
               lang.hitch(this, function (featureSet) {
                 //console.log(featureSet.features);
 
                 featureSet.features.forEach(function(f){
-                    var CreationDate = new Date(f.attributes.CreationDate);
-                    var BreakException = {};
-                    try {
-                        for(var k in prevDates) {
-                            if(prevDates[k].last || CreationDate > prevDates[k].date) {
-                                prevDates[k].features.push(f.attributes.objectid);
-                                prevDates[k].count++;
+                  var CreationDate = new Date(f.attributes.CreationDate);
+                  var fid =f.attributes.objectid;
+                  var BreakException = {};
+                  
+                  try {
+                    for(var k in prevDates) {
+                      if(prevDates[k].last || CreationDate > prevDates[k].date) {
+                        
+                        prevDates[k].features.push(fid);
+                        prevDates[k].count++;
 
-                                ageingRoot.children.addValue(k).then(function (r){
-                                  r.children.addValue(f.attributes.mgmt_data_source).then(function (r){
-                                    r.children.addValue(f.attributes.Creator).then(function (r){
-                                      r.children.addValue('Type '+f.attributes['feedback_obstype']).then(function (r){
-                                        r.children.addValue("Status "+f.attributes['feedback_status'], 10).then(
-                                          function (r){
-                                            //console.log(ageingRoot, r);
-                                            throw BreakException;
-                                          },
-                                          function (err){
-                                            console.log('ageingRoot', err);
-                                          }
-                                        )
-                                      })
-                                    });
-                                  });
-                                });
+                        ageingRoot
+                          .children.addValue(k, fid)
+                          .children.addValue(f.attributes.mgmt_data_source, fid)
+                          .children.addValue(f.attributes.Creator, fid)
+                          .children.addValue('Type '+f.attributes['feedback_obstype'], fid)
+                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 1)
 
-                            }
-                        }
-                    } catch(e) {
-                      if (e!==BreakException) {
-                        throw e;
-                      }
-                      else {
-                        console.error(e);
+                        throw BreakException;
                       }
                     }
-                })
-              }),
-              function(err) { 
-                console.log(err.error.code + ": " + err.error.description, err);
-              }
-            ).always(function() {
+                  } catch (be) {
+                    if (be !== BreakException) {
+                      dfr.reject(be);
+                      throw be;
+                    }
+                  }
+                }
+              )
+
               if(dataSources.length > 0) {
                 return getSumCounts(dfr, dataSources);
               }
               else {
                 dfr.resolve(prevDates);
               }
-            });
+
+              }),
+              function(err) { 
+                console.log('executeQuery', err.error.code + ": " + err.error.description, err);
+              }
+            );
           }
 
           return dfr;
@@ -231,6 +230,7 @@ define([
         getSumCounts(new Deferred, dataSources).then(function() {
           dfr.resolve({prevDates:prevDates, ageingRoot:ageingRoot});
         });
+
         return dfr;
       };
 
@@ -240,11 +240,7 @@ define([
           //console.log(results,JSON.stringify(results.ageingRoot));
           // return;
 
-          //var root = JSON.parse(JSON.stringify(results.ageingRoot));
-
-          //Bilevel.Clear();
           Bilevel.Plot(results.ageingRoot);
-
         },
         function(error) {
           console.error('exec', error)
@@ -253,8 +249,10 @@ define([
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {
-      Bilevel.Clear(d3.select("body")[0][0].clientWidth);
-      this.getDataSourceProxies().then( lang.hitch(this, function(ds) {this.getContsByDates(ds)}))
+      Bilevel.Init(d3.select("body")[0][0].clientWidth);
+      this.getDataSourceProxies().then( lang.hitch(this, function(dataSources) {
+        this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0}))
+      }))
     },
 
   });
