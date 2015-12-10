@@ -163,7 +163,7 @@ svg {
 
 .pathLabel tspan{
   font-family: 'arial narrow';
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bolder;
 }
 
@@ -185,7 +185,7 @@ svg {
     background-color: gray;
     color:aliceblue;
     border: solid 2px rgba(255,255,255,0.75);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bolder;
     padding: 3px 9px;
     width: 200px;

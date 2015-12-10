@@ -14,6 +14,8 @@ var _private = {
 
   svg : null,
 
+  total : 0,
+
   partition : d3.layout.partition().sort(function(a, b) { return d3.ascending(a.name, b.name); }),
 
   arc : d3.svg.arc()
@@ -36,7 +38,7 @@ var _private = {
   },
 
   lum : function(d) {
-    return _private.luminance((6-d.depth)/2 * d.sum * 10000);
+    return _private.luminance((6-d.depth) * d.sum * 150000 / Math.min(1, _private.total)/5);
   },
 
   txtColor : function(d) {
@@ -67,9 +69,10 @@ var _private = {
       _private.partition.size([2 * Math.PI, _private.radius]);
     },
 
-    Plot : function(root) {
+    Plot : function(root, total) {
       var div = d3.select("#BilevelPlotDiv");
       div[0][0].innerHTML ='';
+      _private.total = total;
 
       _private.svg = 
         div.append("svg")

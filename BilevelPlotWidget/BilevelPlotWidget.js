@@ -192,11 +192,11 @@ define([
                         prevDates[k].count++;
 
                         ageingRoot
-                          .children.addValue(k, fid)
                           .children.addValue(f.attributes.Creator, fid)
+                          .children.addValue(k, fid)
                           .children.addValue(f.attributes.mgmt_data_source, fid)
                           .children.addValue('Type '+f.attributes['feedback_obstype'], fid)
-                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 5)
+                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 1)
 
                         throw BreakException;
                       }
@@ -228,7 +228,9 @@ define([
         };
 
         getSumCounts(new Deferred, dataSources).then(function() {
-          dfr.resolve({prevDates:prevDates, ageingRoot:ageingRoot});
+          var t = 0;
+          for(var k in prevDates) { t += prevDates[k].count}
+          dfr.resolve({total:t, prevDates:prevDates, ageingRoot:ageingRoot});
         });
 
         return dfr;
@@ -240,7 +242,7 @@ define([
           //console.log(results,JSON.stringify(results.ageingRoot));
           // return;
 
-          Bilevel.Plot(results.ageingRoot);
+          Bilevel.Plot(results.ageingRoot, results.total);
         },
         function(error) {
           console.error('exec', error)
