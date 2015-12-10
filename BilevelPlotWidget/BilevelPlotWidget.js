@@ -170,10 +170,10 @@ define([
         }
         prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
         
+        var ageingRoot = {"name": "ageing", "children": new ChildrenArray};
         var getSumCounts = function(dfr, dataSources) {
 
           if(dataSources && dataSources.length > 0) {
-            ageingRoot = {"name": "ageing", "children": new ChildrenArray};
 
             executeQuery(dataSources.pop(), query).then(
               lang.hitch(this, function (featureSet) {
@@ -193,10 +193,10 @@ define([
 
                         ageingRoot
                           .children.addValue(k, fid)
-                          .children.addValue(f.attributes.mgmt_data_source, fid)
                           .children.addValue(f.attributes.Creator, fid)
+                          .children.addValue(f.attributes.mgmt_data_source, fid)
                           .children.addValue('Type '+f.attributes['feedback_obstype'], fid)
-                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 1)
+                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 5)
 
                         throw BreakException;
                       }
