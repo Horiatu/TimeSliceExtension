@@ -184,6 +184,14 @@ svg {
     padding: 3px 9px;
     width: 200px;
     border-radius: 12px;
+    cursor: pointer;
+}
+
+.dragKey {
+  position:absolute;
+  z-index: 10000;
+  cursor: ns-resize;
+  opacity:0.5;
 }
 
 .keys:hover {
@@ -191,8 +199,8 @@ svg {
 }
 
 .keyName, .keyValue {
-  display: inline-block;
   pointer-events: none;
+  display: inline-block;
 }
 
 .keyValue {
@@ -203,7 +211,7 @@ svg {
   margin: 1px 10px;
   background-color: transparent;
   color: black;
-  border: solid 2px rgba(200,200,200,0.75);
+  border: solid 2px #6fc0e7;
   font-size: 13px;
   font-weight: bolder;
   padding: 3px 9px;
@@ -226,7 +234,7 @@ svg {
 }
 
 #refreshBtn:hover {
-  border: solid 2px rgba(100,100,100,0.75);
+  --border: solid 2px rgba(100,100,100,0.75);
 }
 
 #refreshBtn:hover span {

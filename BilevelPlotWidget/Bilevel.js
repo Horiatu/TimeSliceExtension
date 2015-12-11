@@ -57,6 +57,29 @@ var _private = {
     return {depth: d.depth, x: d.x, dx: d.dx};
   },
 
+  //dragX :0,
+  dragY :0,
+  drag : d3.behavior.drag()
+    .on("dragstart", function(){
+        //console.log("dragstart", d3.event, d3.event.sourceEvent, d3.event.sourceEvent.srcElement);
+        //dragX = d3.event.sourceEvent.offsetX;
+        dragY = d3.event.sourceEvent.offsetY;
+
+        d3.select(d3.event.sourceEvent.srcElement)
+        .classed('dragKey',true)
+        .style('top',d3.event.sourceEvent.y-dragY+'px');
+    })
+    .on("drag", function(){
+        //console.log("drag", d3.event);
+        d3.select(d3.event.sourceEvent.srcElement).style('top',d3.event.sourceEvent.y-dragY+'px');
+    })
+    .on("dragend", function(){
+        //console.log("dragend", d3.event);
+        d3.select(d3.event.sourceEvent.srcElement)
+        .classed('dragKey',false)
+        .style('top','');
+        d3.select('#refreshBtn').style('opacity', 1);
+    })
 }
 
   var _public = {
@@ -235,6 +258,8 @@ var _private = {
         li.append('div').attr('class','keyValue').text(function(k) {return k[1]});
 
         lis.exit().remove();
+
+        d3.selectAll(".keys").call(_private.drag);
       }
 
       addCaption(path);
