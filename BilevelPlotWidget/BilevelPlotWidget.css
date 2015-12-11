@@ -217,6 +217,14 @@ svg {
   padding: 3px 9px;
   border-radius: 12px;
   display: inline-block;
+  --opacity:0;
+  -webkit-transition: opacity 0.25s ease-in-out;
+  -moz-transition: opacity 0.25s ease-in-out;
+  -o-transition: opacity 0.25s ease-in-out;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.hideOpac {
   opacity:0;
 }
 

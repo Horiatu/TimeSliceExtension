@@ -60,6 +60,7 @@ define([
 
         return valObj;
       }
+
     },
 
     postCreate: function () {
@@ -68,6 +69,8 @@ define([
     },
 
     hostReady: function(){
+
+      Bilevel.OnRefresh(this, this.PlotChart);
 
       // Time Chart time Properties
       totalDays = document.getElementById("totalDays");
@@ -119,9 +122,9 @@ define([
       });
     },
 
-    ageingRoot : {},
-
     PlotContsByDates : function(dataSources) {
+      var ageingRoot = {};
+
       var executeQuery = function(ds, query) {
         return Msg._sendMessageWithReply({
           functionName: "executeQuery",

@@ -78,8 +78,9 @@ var _private = {
         d3.select(d3.event.sourceEvent.srcElement)
         .classed('dragKey',false)
         .style('top','');
-        d3.select('#refreshBtn').style('opacity', 1);
-    })
+        d3.select('#refreshBtn').classed('hideOpac', false);
+    }),
+
 }
 
   var _public = {
@@ -343,9 +344,18 @@ var _private = {
               .each('end', render);
         });
       }
+    
+      d3.select('#refreshBtn').classed('hideOpac', true);
+    },
+
+    OnRefresh : function(context, callback) {
+      d3.select('#refreshBtn').on("click", function(e) {
+        callback.call(context);
+      });
     }
   };
 
   return _public;
 
 }();
+{}
