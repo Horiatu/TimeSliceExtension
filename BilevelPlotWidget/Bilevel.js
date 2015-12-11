@@ -241,8 +241,8 @@ var _private = {
 
       function zoomIn(p) {
         if (p.depth > 1) p = p.parent;
-        if (!p.children) return;
         renderKeys(p.key, p.sum);
+        if (!p.children) return;
         zoom(p, p);
       }
 

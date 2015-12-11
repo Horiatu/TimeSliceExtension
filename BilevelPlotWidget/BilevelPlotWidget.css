@@ -126,12 +126,6 @@ label{
 }
 
 #key {
-  width:100%;
-  min-height:48px;
-}
-
-#key h1 {
-  font-size: 14px;
 }
 
 circle,
@@ -203,4 +197,38 @@ svg {
 
 .keyValue {
   float:right;
+}
+
+#refreshBtn {
+  margin: 1px 10px;
+  background-color: transparent;
+  color: black;
+  border: solid 2px rgba(200,200,200,0.75);
+  font-size: 13px;
+  font-weight: bolder;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: inline-block;
+  opacity:0;
+}
+
+#refreshBtn img {
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+  margin: -1px -6px -4px -6px;
+}
+
+#refreshBtn span {
+  pointer-events: none;
+  margin-left: 10px;
+  display: none;
+}
+
+#refreshBtn:hover {
+  border: solid 2px rgba(100,100,100,0.75);
+}
+
+#refreshBtn:hover span {
+  display: inline-block;
 }
