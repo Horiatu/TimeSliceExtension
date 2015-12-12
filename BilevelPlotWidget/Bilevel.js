@@ -75,11 +75,35 @@ var _private = {
     })
     .on("dragend", function(){
         //console.log("dragend", d3.event);
-        d3.select(d3.event.sourceEvent.srcElement)
-        .classed('dragKey',false)
-        .style('top','');
+
+        // var dragKey = d3.event.sourceEvent.srcElement;
+        // var fixKeys = d3.selectAll('.keys:not(.dragKey)')[0];
+        var top = {top:d3.event.sourceEvent.srcElement.offsetTop, data:d3.select(d3.event.sourceEvent.srcElement).data()[0]};
+        var fixTops = d3.selectAll('.keys:not(.dragKey)')[0].map(function(m) {
+          return {top:m.offsetTop, data:d3.select(m).data()[0]};
+        });
+
+        fixTops.push(top)
+        fixTops.sort(function(a,b) {return a.top - b.top});
+        var data = fixTops.map(function(m) { return m.data })
+
+        d3.select('#key').selectAll('.keys').remove();
+        _private.renderKeys(data);
         d3.select('#refreshBtn').classed('hideOpac', false);
     }),
+
+    renderKeys : function(data) {
+      var lis = d3.select('#key').selectAll('div.keys').data(data);
+      var li = lis.enter().append('div').attr('class','keys')
+      .style('background-color',function(k) {return k[2]})
+      .style('color',function(k) {return k[3]})
+      li.append('div').attr('class','keyName').text(function(k) {return k[0]});
+      li.append('div').attr('class','keyValue').text(function(k) {return k[1]});
+
+      lis.exit().remove();
+
+      d3.selectAll(".keys").call(_private.drag);
+    }
 
 }
 
@@ -251,16 +275,7 @@ var _private = {
           keys = key
         }
 
-        var lis = d3.select('#key').selectAll('div.keys').data(keys);
-        var li = lis.enter().append('div').attr('class','keys')
-        .style('background-color',function(k) {return k[2]})
-        .style('color',function(k) {return k[3]})
-        li.append('div').attr('class','keyName').text(function(k) {return k[0]});
-        li.append('div').attr('class','keyValue').text(function(k) {return k[1]});
-
-        lis.exit().remove();
-
-        d3.selectAll(".keys").call(_private.drag);
+        _private.renderKeys(keys);
       }
 
       addCaption(path);
