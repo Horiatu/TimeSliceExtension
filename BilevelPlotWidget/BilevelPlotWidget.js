@@ -28,6 +28,7 @@ define([
     debugName: "TimeChartWidget",
 
     constructor: function() {
+      document.QueryFieldNdx = [0, 1, 2, 3, 4];
       Date.prototype.addDays = function (n) {
         var time = this.getTime();
         var changedDate = new Date(time + (n * 24 * 60 * 60 * 1000));
@@ -70,7 +71,10 @@ define([
 
     hostReady: function(){
 
-      Bilevel.OnRefresh(this, this.PlotChart);
+      Bilevel.OnRefresh(this, function(qNdx) {
+        document.QueryFieldNdx = qNdx;
+        this.PlotChart();
+      });
 
       // Time Chart time Properties
       totalDays = document.getElementById("totalDays");
@@ -124,6 +128,10 @@ define([
 
     PlotContsByDates : function(dataSources) {
       var ageingRoot = {};
+      
+      // if(qNdx != undefined)
+      // document.QueryFieldNdx = qNdx; 
+    
 
       var executeQuery = function(ds, query) {
         return Msg._sendMessageWithReply({
@@ -188,12 +196,19 @@ define([
                         prevDates[k].features.push(fid);
                         prevDates[k].count++;
 
+                        var values = [
+                          k, 
+                          f.attributes.mgmt_data_source, 
+                          f.attributes.Creator, 
+                          'Type '+f.attributes['feedback_obstype'],
+                          'Status '+f.attributes['feedback_status']
+                        ];
                         ageingRoot
-                          .children.addValue(k, fid)
-                          .children.addValue(f.attributes.mgmt_data_source, fid)
-                          .children.addValue(f.attributes.Creator, fid)
-                          .children.addValue('Type '+f.attributes['feedback_obstype'], fid)
-                          .children.addValue('Status '+f.attributes['feedback_status'], fid, 1)
+                          .children.addValue(values[document.QueryFieldNdx[0]], fid)
+                          .children.addValue(values[document.QueryFieldNdx[1]], fid)
+                          .children.addValue(values[document.QueryFieldNdx[2]], fid)
+                          .children.addValue(values[document.QueryFieldNdx[3]], fid)
+                          .children.addValue(values[document.QueryFieldNdx[4]], fid, 1)
 
                         throw BreakException;
                       }
@@ -247,10 +262,10 @@ define([
       )
     },
 
-    PlotChart: function( ) {
+    PlotChart: function( qNdx) {
       Bilevel.Init(d3.select("body")[0][0].clientWidth);
       this.getDataSourceProxies().then( lang.hitch(this, function(dataSources) {
-        this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0}))
+        this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0}), qNdx)
       }))
     },
 

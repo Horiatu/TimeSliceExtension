@@ -78,14 +78,16 @@ var _private = {
 
         // var dragKey = d3.event.sourceEvent.srcElement;
         // var fixKeys = d3.selectAll('.keys:not(.dragKey)')[0];
-        var top = {top:d3.event.sourceEvent.srcElement.offsetTop, data:d3.select(d3.event.sourceEvent.srcElement).data()[0]};
-        var fixTops = d3.selectAll('.keys:not(.dragKey)')[0].map(function(m) {
+        //var top = {top:d3.event.sourceEvent.srcElement.offsetTop, data:d3.select(d3.event.sourceEvent.srcElement).data()[0]};
+        var fixTops = d3.selectAll('.keys')[0].map(function(m) {
           return {top:m.offsetTop, data:d3.select(m).data()[0]};
         });
 
-        fixTops.push(top)
+        //fixTops.push(top)
         fixTops.sort(function(a,b) {return a.top - b.top});
-        var data = fixTops.map(function(m) { return m.data })
+        var data = fixTops.map(function(m) { 
+          return m.data; 
+        })
 
         d3.select('#key').selectAll('.keys').remove();
         _private.renderKeys(data);
@@ -365,7 +367,7 @@ var _private = {
 
     OnRefresh : function(context, callback) {
       d3.select('#refreshBtn').on("click", function(e) {
-        callback.call(context);
+        callback.call(context, [1, 0, 2, 4, 3]);
       });
     }
   };
