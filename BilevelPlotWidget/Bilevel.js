@@ -25,7 +25,7 @@ var _private = {
 
   key : function(d) {
     var k = []; p = d;
-    while (p.depth) k.push([p.name, p.sum, this.fill(d), this.txtColor(d)]), p = p.parent;
+    while (p.depth) k.push([p.name, p.sum, this.fill(d), this.txtColor(d), p.nid]), p = p.parent;
     return k.reverse()
   },
 
@@ -119,10 +119,15 @@ var _private = {
       _private.partition.size([2 * Math.PI, _private.radius]);
     },
 
-    Plot : function(root, total) {
+    Plot : function(root) {
       var div = d3.select("#BilevelPlotDiv");
       div[0][0].innerHTML ='';
-      _private.total = total;
+
+
+      _private.total = 0;
+      root.children.forEach(function(r) {
+        _private.total += r.fids.length;
+      });
 
       _private.svg = 
         div.append("svg")
@@ -367,7 +372,13 @@ var _private = {
 
     OnRefresh : function(context, callback) {
       d3.select('#refreshBtn').on("click", function(e) {
-        callback.call(context, [1, 0, 2, 4, 3]);
+        var vals = d3.selectAll('.keys')[0];
+
+        var a = [];
+        for(var i=0; i<vals.length; i++)
+          a.push(d3.select(vals[i]).data()[0][4]);
+
+        callback.call(context, a);
       });
     }
   };
@@ -375,4 +386,3 @@ var _private = {
   return _public;
 
 }();
-{}

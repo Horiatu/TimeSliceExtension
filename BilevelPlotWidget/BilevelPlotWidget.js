@@ -37,10 +37,10 @@ define([
       }
 
       ChildrenArray = Array;
-      ChildrenArray.prototype.addValue = function(k, id, v) {
+      ChildrenArray.prototype.addValue = function(k, nid, id, v) {
         var valObj = undefined;
         this.some(function(f,i) {
-          if(f.name == k) {
+          if(f.name == k[nid]) {
             valObj = f;
             return true;
           }
@@ -49,8 +49,8 @@ define([
 
         if(valObj == undefined) {
           valObj = (v == undefined) 
-            ? {name:k, fids:[id], children:new ChildrenArray} 
-            : {name:k, fids:[id], size:v};
+            ? {name:k[nid], fids:[id], children:new ChildrenArray, nid:nid} 
+            : {name:k[nid], fids:[id], size:v, nid:nid};
           this.push(valObj);
         } else {
           valObj.fids.push(id)
@@ -72,7 +72,9 @@ define([
     hostReady: function(){
 
       Bilevel.OnRefresh(this, function(qNdx) {
-        document.QueryFieldNdx = qNdx;
+        for(var i=0; i<qNdx.length; i++)
+          document.QueryFieldNdx[i]=qNdx[i];
+        
         this.PlotChart();
       });
 
@@ -204,11 +206,11 @@ define([
                           'Status '+f.attributes['feedback_status']
                         ];
                         ageingRoot
-                          .children.addValue(values[document.QueryFieldNdx[0]], fid)
-                          .children.addValue(values[document.QueryFieldNdx[1]], fid)
-                          .children.addValue(values[document.QueryFieldNdx[2]], fid)
-                          .children.addValue(values[document.QueryFieldNdx[3]], fid)
-                          .children.addValue(values[document.QueryFieldNdx[4]], fid, 1)
+                          .children.addValue(values, document.QueryFieldNdx[0], fid)
+                          .children.addValue(values, document.QueryFieldNdx[1], fid)
+                          .children.addValue(values, document.QueryFieldNdx[2], fid)
+                          .children.addValue(values, document.QueryFieldNdx[3], fid)
+                          .children.addValue(values, document.QueryFieldNdx[4], fid, 1)
 
                         throw BreakException;
                       }
@@ -240,9 +242,7 @@ define([
         };
 
         getSumCounts(new Deferred, dataSources).then(function() {
-          var t = 0;
-          for(var k in prevDates) { t += prevDates[k].count}
-          dfr.resolve({total:t, prevDates:prevDates, ageingRoot:ageingRoot});
+           dfr.resolve({prevDates:prevDates, ageingRoot:ageingRoot});
         });
 
         return dfr;
@@ -254,7 +254,7 @@ define([
           //console.log(results,JSON.stringify(results.ageingRoot));
           // return;
 
-          Bilevel.Plot(results.ageingRoot, results.total);
+          Bilevel.Plot(results.ageingRoot);
         },
         function(error) {
           console.error('exec', error)
