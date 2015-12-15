@@ -42,7 +42,7 @@ var _private = {
   },
 
   txtColor : function(d) {
-    return this.lum(d)<70 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)'
+    return this.lum(d)<60 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)'
   },
 
   arcTween : function(b) {

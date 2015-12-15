@@ -202,8 +202,8 @@ define([
                           k, 
                           f.attributes.mgmt_data_source, 
                           f.attributes.Creator, 
-                          'Type '+f.attributes['feedback_obstype'],
-                          'Status '+f.attributes['feedback_status']
+                          document.TypeCVs.find(function(c) {return c.code==f.attributes['feedback_obstype']})['name'],
+                          document.StatusCVs.find(function(c) {return c.code==f.attributes['feedback_status']})['name']
                         ];
                         ageingRoot
                           .children.addValue(values, document.QueryFieldNdx[0], fid)
@@ -265,6 +265,9 @@ define([
     PlotChart: function( qNdx) {
       Bilevel.Init(d3.select("body")[0][0].clientWidth);
       this.getDataSourceProxies().then( lang.hitch(this, function(dataSources) {
+        document.StatusCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_status"}).domain.codedValues;
+        document.TypeCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_obstype"}).domain.codedValues;
+
         this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0}), qNdx)
       }))
     },
