@@ -117,7 +117,7 @@ var _private = {
       _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
       _private.partition = d3.layout.partition().sort(function(a, b) { return d3.ascending(a.name, b.name); }); 
       _private.partition.size([2 * Math.PI, _private.radius]);
-      _private.arcLabelFontSize = (_private.radius>200) ? 16 : 12;
+      _private.arcLabelFontSize = (_private.radius>200) ? 16 : 11;
     },
 
     Plot : function(root) {
