@@ -117,6 +117,7 @@ var _private = {
       _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
       _private.partition = d3.layout.partition().sort(function(a, b) { return d3.ascending(a.name, b.name); }); 
       _private.partition.size([2 * Math.PI, _private.radius]);
+      _private.arcLabelFontSize = (_private.radius>200) ? 16 : 12;
     },
 
     Plot : function(root) {
@@ -217,23 +218,29 @@ var _private = {
         var parc = g.append('path').attr('d',x).attr('id',id).attr('class', 'helperPath')[0][0];
         var plen = parc.getTotalLength();
         
-        var getLength = function(text) {
-          var t = g.append('text').attr('id', 'xxx').attr('class', 'pathLabel').text(text);
+        var getLength = function(text, fs) {
+          var t = g.append('text')
+          .attr('id', 'xxx')
+          .attr('class', 'pathLabel')
+          .style('font-size', fs)
+          .text(text);
           var tlen = t[0][0].clientWidth;
           g.select('#xxx').remove();
           return tlen;
         }
 
+        
+
         var pc = (data.sum/total*100).toFixed(0)+'%';
         var label=data.name+': '+data.sum + ' ('+pc+')';
         d3.select(this).append("title").text(label);
 
-        var tlen = getLength(label);
+        var tlen = getLength(label, _private.arcLabelFontSize);
         if(plen * 0.90 < tlen) {
-          tlen = getLength(label = data.sum + ' ('+pc+')');
+          tlen = getLength(label = data.sum + ' ('+pc+')', _private.arcLabelFontSize);
 
           if(plen * 0.90 < tlen) {
-            tlen = getLength(label = pc);
+            tlen = getLength(label = pc, _private.arcLabelFontSize);
           }
         }
 
@@ -243,7 +250,7 @@ var _private = {
           var p0 = parc.getPointAtLength(0);
           var p1 = parc.getPointAtLength(plen);
           
-          dy = 20;
+          dy = _private.arcLabelFontSize*1.4;
           if(p0.x > p1.x) {
             
             var xxx = /0 (?:0|1) 1/.exec(x)[0];
@@ -254,7 +261,7 @@ var _private = {
             //Build up the new arc notation, set the sweep-flag to 0
             var newArc = "M" + newStart + "A" + middleSec + '1 '+xxx[2]+' 0 ' + newEnd;
             d3.select(parc).attr('d',newArc);
-            dy = -13;
+            dy = -13/dy-10;
           }
 
           g.append('text')
@@ -262,7 +269,12 @@ var _private = {
             .attr('x', (plen-tlen)/2)
             .attr('dy', dy)
           .append('textPath')
-            .attr('xlink:href', '#'+id).attr('id', 't'+id).append('tspan').style('fill',txtColor).text(label);
+            .attr('xlink:href', '#'+id)
+            .attr('id', 't'+id)
+            .append('tspan')
+            .style('fill',txtColor)
+            .style('font-size',_private.arcLabelFontSize+'px')
+            .text(label);
         }
       };
 
