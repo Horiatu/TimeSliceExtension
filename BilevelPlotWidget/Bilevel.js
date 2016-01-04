@@ -112,7 +112,7 @@ var _private = {
   var _public = {
 
     Init : function(width) {
-      var m = width/2-20;
+      var m = width/2-10;
       _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
       _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
       _private.partition = d3.layout.partition().sort(function(a, b) { return d3.ascending(a.name, b.name); }); 
@@ -186,10 +186,10 @@ var _private = {
           
         center.append("title").text("zoom out");
         d3.select('g').append('text')
-            .attr('x', 0).attr('y','50')
+            .attr('x', 0).attr('y',_private.radius/4)
             .attr('id', 'countText')
             .attr('title', 'Total')
-            .text('00');
+            .text('');
       }
       else {
         center = center[0][0];
