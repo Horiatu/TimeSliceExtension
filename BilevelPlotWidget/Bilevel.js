@@ -185,10 +185,12 @@ var _private = {
             .on("click", zoomOut)
           
         center.append("title").text("zoom out");
+        var fs = _private.radius/10;
         d3.select('g').append('text')
-            .attr('x', 0).attr('y',_private.radius/4)
+            .attr('x', 0).attr('y',_private.radius/6+fs/2)
             .attr('id', 'countText')
             .attr('title', 'Total')
+            .style('font-size',fs+'px')
             .text('');
       }
       else {
