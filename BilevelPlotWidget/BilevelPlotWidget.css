@@ -90,7 +90,7 @@ label{
   border:none;
   opacity:0.5;
   outline: none !important;
-  background-color: white;
+  background-color: transparent;
 }
 
 #expandBtn img {

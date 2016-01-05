@@ -104,6 +104,8 @@ define([
 
       var expandBtn = document.getElementById("expandBtn");
       var TotalPeriod = document.getElementById("TotalPeriod");
+      var TotalPeriod1 = document.getElementById("TotalPeriod1");
+
       expandBtn.addEventListener("keydown", function(e) {
         if(e.keyCode==9 && !e.shiftKey) {
           e.preventDefault();
@@ -118,10 +120,12 @@ define([
         var expandBtn = document.getElementById("expandBtn");
         if(TotalPeriod.className=='hide') {
           TotalPeriod.className = '';
+          TotalPeriod1.setAttribute('style','background-color: white;');
           expandBtn.children[0].setAttribute('src', 'collapse.png');
           expandBtn.setAttribute('title', 'collapse');
         } else {
           TotalPeriod.className='hide';
+          TotalPeriod1.setAttribute('style','background-color: transparent;');
           expandBtn.children[0].setAttribute('src', 'expand.png');
           expandBtn.setAttribute('title', 'expand');
         }

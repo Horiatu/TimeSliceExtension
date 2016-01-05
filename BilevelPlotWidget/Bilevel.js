@@ -83,7 +83,6 @@ var _private = {
           return {top:m.offsetTop, data:d3.select(m).data()[0]};
         });
 
-        //fixTops.push(top)
         fixTops.sort(function(a,b) {return a.top - b.top});
         var data = fixTops.map(function(m) { 
           return m.data; 
