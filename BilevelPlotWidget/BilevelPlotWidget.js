@@ -13,7 +13,7 @@ define([
   "esri/opsdashboard/core/messageHandler",
   "esri/opsdashboard/DataSourceProxy",
   "esri/tasks/FeatureSet",
-  "dijit/_WidgetBase",
+  "dijit/_WidgetBase", 
   "dijit/_TemplatedMixin",
   "esri/opsdashboard/WidgetProxy",
   "esri/tasks/query",
@@ -34,33 +34,33 @@ define([
         var changedDate = new Date(time + (n * 24 * 60 * 60 * 1000));
         this.setTime(changedDate.getTime());
         return this;
-      }
+      };
 
       ChildrenArray = Array;
       ChildrenArray.prototype.addValue = function(k, nid, id, v) {
-        var valObj = undefined;
+        var valObj;
         this.some(function(f,i) {
           if(f.name == k[nid]) {
             valObj = f;
             return true;
           }
           return false;
-        })
+        });
 
-        if(valObj == undefined) {
-          valObj = (v == undefined) 
-            ? {name:k[nid], fids:[id], children:new ChildrenArray, nid:nid} 
+        if(valObj === undefined) {
+          valObj = (v === undefined) 
+            ? {name:k[nid], fids:[id], children: new ChildrenArray(), nid:nid} 
             : {name:k[nid], fids:[id], size:v, nid:nid};
           this.push(valObj);
         } else {
-          valObj.fids.push(id)
-          if(v != undefined) {
+          valObj.fids.push(id);
+          if(v !== undefined) {
             valObj.size += v;
           }
         }
 
         return valObj;
-      }
+      };
 
     },
 
@@ -88,7 +88,7 @@ define([
       );
 
       totalDays.addEventListener("change", lang.hitch(this, function(v) { 
-          this.PlotChart()
+          this.PlotChart();
         })
       );
 
@@ -98,7 +98,7 @@ define([
       );
 
       period.addEventListener("change", lang.hitch(this, function(v) { 
-          this.PlotChart()
+          this.PlotChart();
         })
       );
 
@@ -110,7 +110,7 @@ define([
         if(e.keyCode==9 && !e.shiftKey) {
           e.preventDefault();
           expandBtn.click();
-          if(TotalPeriod.className=='') {
+          if(TotalPeriod.className === '') {
             document.getElementById('totalDays').focus();
           }
         }
@@ -149,16 +149,16 @@ define([
           }).then(
             lang.hitch(this, function(result) {
               //this.isBroken = !1;
-              if(result.cancel==true) {
+              if(result.cancel===true) {
                 throw {error:{code:"cancel", description:ds.id}};
               }
-              return new FeatureSet(result.featureSet)
+              return new FeatureSet(result.featureSet);
             }), 
             lang.hitch(this, function(err) {
               //this.isBroken = !0;
               throw err;
             })
-          )
+          );
       };
 
       var exec = function(dfr) {
@@ -166,27 +166,29 @@ define([
 
         var query = new Query();
         query.outFields = ["objectid", "CreationDate", "Creator", "feedback_obstype", "feedback_status", "mgmt_data_source"];
-        query.returnGeometry = false;
+        query.returnGeometry = true;
 
         var prevDates = {};
         var maxDays = parseInt(this.totalDays.value);
         var period = parseInt(this.period.value);
-
+        
+        var j;
         for(var i=1; i<=maxDays / period; i++) {
-            var j=i*period;
+            j=i*period;
             var k = i==1 
             ? ("less than "+j+" days") 
             : (((i-1) * period)+1 + " to " + (i*period) + " days");
             prevDates[k]={ date: new Date().addDays(-j), count:0, features:[]};
         }
-        prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:[]};
+        prevDates["more than "+(j+1)+" days"]={ date: new Date().addDays(-10000), count:0, last:true, features:{}};
         
-        var ageingRoot = {"name": "ageing", "children": new ChildrenArray};
+        var ageingRoot = {"name": "ageing", "children": new ChildrenArray()};
         var getSumCounts = function(dfr, dataSources) {
 
           if(dataSources && dataSources.length > 0) {
 
-            executeQuery(dataSources.pop(), query).then(
+            var dataSource = dataSources.pop();
+            executeQuery(dataSource, query).then(
               lang.hitch(this, function (featureSet) {
                 //console.log(featureSet.features);
 
@@ -198,23 +200,26 @@ define([
                   try {
                     for(var k in prevDates) {
                       if(prevDates[k].last || CreationDate > prevDates[k].date) {
+
+                        if(!prevDates[k].features[dataSource.id] || prevDates[k].features[dataSource.id] === undefined)
+                          prevDates[k].features[dataSource.id] = [];
                         
-                        prevDates[k].features.push(fid);
+                        prevDates[k].features[dataSource.id].push(fid);
                         prevDates[k].count++;
 
                         var values = [
                           k, 
                           f.attributes.mgmt_data_source, 
                           f.attributes.Creator, 
-                          document.TypeCVs.find(function(c) {return c.code==f.attributes['feedback_obstype']})['name'],
-                          document.StatusCVs.find(function(c) {return c.code==f.attributes['feedback_status']})['name']
+                          document.TypeCVs.find(function(c) { return c.code==f.attributes.feedback_obstype; }).name,
+                          document.StatusCVs.find(function(c) { return c.code==f.attributes.feedback_status; }).name
                         ];
                         ageingRoot
                           .children.addValue(values, document.QueryFieldNdx[0], fid)
                           .children.addValue(values, document.QueryFieldNdx[1], fid)
                           .children.addValue(values, document.QueryFieldNdx[2], fid)
                           .children.addValue(values, document.QueryFieldNdx[3], fid)
-                          .children.addValue(values, document.QueryFieldNdx[4], fid, 1)
+                          .children.addValue(values, document.QueryFieldNdx[4], fid, 1);
 
                         throw BreakException;
                       }
@@ -226,7 +231,7 @@ define([
                     }
                   }
                 }
-              )
+              );
 
               if(dataSources.length > 0) {
                 return getSumCounts(dfr, dataSources);
@@ -245,14 +250,14 @@ define([
           return dfr;
         };
 
-        getSumCounts(new Deferred, dataSources).then(function() {
+        getSumCounts(new Deferred(), dataSources).then(function() {
            dfr.resolve({prevDates:prevDates, ageingRoot:ageingRoot});
         });
 
         return dfr;
       };
 
-      exec(new Deferred).then(
+      exec(new Deferred()).then(
         function(results) {
 
           //console.log(results,JSON.stringify(results.ageingRoot));
@@ -261,19 +266,19 @@ define([
           Bilevel.Plot(results.ageingRoot);
         },
         function(error) {
-          console.error('exec', error)
+          console.error('exec', error);
         }
-      )
+      );
     },
 
     PlotChart: function( qNdx) {
       Bilevel.Init(d3.select("body")[0][0].clientWidth);
       this.getDataSourceProxies().then( lang.hitch(this, function(dataSources) {
-        document.StatusCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_status"}).domain.codedValues;
-        document.TypeCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_obstype"}).domain.codedValues;
+        document.StatusCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_status"; }).domain.codedValues;
+        document.TypeCVs = dataSources[0].fields.find(function (f) { return f.name == "feedback_obstype"; }).domain.codedValues;
 
-        this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0}), qNdx)
-      }))
+        this.PlotContsByDates(dataSources.filter(function(ds) {return ds.name.indexOf('Selection') < 0; }), qNdx);
+      }));
     },
 
     dataSourceExpired: function (dataSourceProxy, dataSourceConfig) {

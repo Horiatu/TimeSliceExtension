@@ -21,12 +21,12 @@ var _private = {
   arc : d3.svg.arc()
       .startAngle(function(d) { return d.x; })
       .endAngle(function(d) { return d.x + d.dx; })
-      .padAngle(.01),
+      .padAngle(0.01),
 
   key : function(d) {
     var k = []; p = d;
     while (p.depth) k.push([p.name, p.sum, this.fill(d), this.txtColor(d), p.nid]), p = p.parent;
-    return k.reverse()
+    return k.reverse();
   },
 
   fill : function (d) {
@@ -42,7 +42,7 @@ var _private = {
   },
 
   txtColor : function(d) {
-    return this.lum(d)<60 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)'
+    return this.lum(d)<60 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.85)';
   },
 
   arcTween : function(b) {
@@ -83,10 +83,10 @@ var _private = {
           return {top:m.offsetTop, data:d3.select(m).data()[0]};
         });
 
-        fixTops.sort(function(a,b) {return a.top - b.top});
+        fixTops.sort(function(a,b) { return a.top - b.top; });
         var data = fixTops.map(function(m) { 
           return m.data; 
-        })
+        });
 
         d3.select('#key').selectAll('.keys').remove();
         _private.renderKeys(data);
@@ -96,23 +96,23 @@ var _private = {
     renderKeys : function(data) {
       var lis = d3.select('#key').selectAll('div.keys').data(data);
       var li = lis.enter().append('div').attr('class','keys')
-      .style('background-color',function(k) {return k[2]})
-      .style('color',function(k) {return k[3]})
-      li.append('div').attr('class','keyName').text(function(k) {return k[0]});
-      li.append('div').attr('class','keyValue').text(function(k) {return k[1]});
+      .style('background-color',function(k) { return k[2]; })
+      .style('color',function(k) { return k[3]; });
+      li.append('div').attr('class','keyName').text(function(k) { return k[0]; });
+      li.append('div').attr('class','keyValue').text(function(k) { return k[1]; });
 
       lis.exit().remove();
 
       d3.selectAll(".keys").call(_private.drag);
     }
 
-}
+};
 
   var _public = {
 
     Init : function(width) {
       var m = width/2-10;
-      _private.margin = {top: m, right: m, bottom: m, bottom: m, left: m};
+      _private.margin = {top: m, right: m, bottom: m, left: m};
       _private.radius = Math.min(_private.margin.top, _private.margin.right, _private.margin.bottom, _private.margin.bottom);
       _private.partition = d3.layout.partition().sort(function(a, b) { return d3.ascending(a.name, b.name); }); 
       _private.partition.size([2 * Math.PI, _private.radius]);
@@ -182,7 +182,7 @@ var _private = {
         center = _private.svg.append("circle")
             .attr('id','center')
             .attr("r", _private.radius / 3)
-            .on("click", zoomOut)
+            .on("click", zoomOut);
           
         center.append("title").text("zoom out");
         var fs = _private.radius/10;
@@ -205,10 +205,10 @@ var _private = {
           .each(function(d) { this._current = _private.updateArc(d); })
           .on("click", zoomIn);
 
-      g = d3.select('g')
+      g = d3.select('g');
 
       function render(data, i) {
-        var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/
+        var firstArcSection = /(^.+?A((-?\d+(\.\d+)?)\s+){2})(([0|1])\s){3}((-?\d+(\.\d+)?)\s*){2}/;
         var x = firstArcSection.exec( d3.select(this).attr("d").replace(/,/g , " ") )[0];
         var l = data.fill.l;
         var txtColor = data.txtColor;
@@ -226,7 +226,7 @@ var _private = {
           var tlen = t[0][0].clientWidth;
           g.select('#xxx').remove();
           return tlen;
-        }
+        };
 
         
 
@@ -254,7 +254,7 @@ var _private = {
             
             var xxx = /0 (?:0|1) 1/.exec(x)[0];
             var newStart = x.match(xxx+'(.*?)$')[1];
-            var middleSec = x.match('A(.*?)'+xxx)[1]
+            var middleSec = x.match('A(.*?)'+xxx)[1];
             var newEnd = /M(.*?)A/.exec( x )[1];
             
             //Build up the new arc notation, set the sweep-flag to 0
@@ -275,7 +275,7 @@ var _private = {
             .style('font-size',_private.arcLabelFontSize+'px')
             .text(label);
         }
-      };
+      }
 
       total = 0;
       function addCaption(paths)
@@ -283,7 +283,7 @@ var _private = {
         g.select('text.pathLabel').remove();
         g.select('path.helperPath').remove();
         paths.select("title").remove();
-        paths.each(function(p,i) {if(p.depth==1) total+=p.sum});
+        paths.each(function(p,i) { if(p.depth == 1) total += p.sum; });
         renderKeys('', total);
         paths.each(render);
       }
@@ -291,8 +291,8 @@ var _private = {
       function renderKeys(key, t) {
         d3.select("#countText")[0][0].innerHTML = total = t;
         var keys = [];
-        if(key != '') {
-          keys = key
+        if(key !== '') {
+          keys = key;
         }
 
         _private.renderKeys(keys);
@@ -309,7 +309,7 @@ var _private = {
 
       function zoomOut(p) {
         if (!p || !p.parent) return;
-        renderKeys(p.parent.key!='' ? p.parent.key : '', p.parent.sum);
+        renderKeys(p.parent.key !== '' ? p.parent.key : '', p.parent.sum);
         
         zoom(p.parent, p);
       }

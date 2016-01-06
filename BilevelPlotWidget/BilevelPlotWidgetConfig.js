@@ -34,7 +34,7 @@ define([
     postCreate: function () {
       this.inherited(arguments);
 
-      debugger;
+      //debugger;
 
       this.idFieldCombo.set("labelAttr", "alias");
       this.xFieldCombo.set("labelAttr", "alias");
